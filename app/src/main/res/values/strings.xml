@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Contact Analyser</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="btn_analyse_call_log">Analyse Call Log</string>
+</resources>
