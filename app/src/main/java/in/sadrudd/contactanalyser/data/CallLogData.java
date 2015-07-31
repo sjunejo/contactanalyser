@@ -1,34 +1,21 @@
 package in.sadrudd.contactanalyser.data;
 
-import android.content.Context;
-import android.database.Cursor;
-import android.provider.CallLog;
+import java.util.HashMap;
 
 /**
- * Created by sjunjo on 30/07/15.
+ * Created by sjunjo on 31/07/15.
  */
 public class CallLogData {
-
-    private String[] columnsFromCallLogToReturn = {
-            CallLog.Calls.CACHED_FORMATTED_NUMBER,
-            CallLog.Calls.CACHED_NAME,
-            CallLog.Calls.TYPE
-    };
+    private HashMap<String, Integer> frequencyOfNumbers;
 
 
-    public void getCallLog(Context context){
-        Cursor cursor = context.getContentResolver().query(CallLog.CONTENT_URI, null, null, null,
-                null);
-        cursor.moveToFirst();
-        int[] columnIndexes = new int[columnsFromCallLogToReturn.length];
-        for (int i = 0; i < columnsFromCallLogToReturn.length; i++){
-            columnIndexes[i] = cursor.getColumnIndexOrThrow(columnsFromCallLogToReturn[i]);
-        }
-        while (cursor.moveToNext()){
-
-        }
-        cursor.close();
+    public CallLogData(){
+        frequencyOfNumbers = new HashMap<String, Integer>();
     }
 
+    public void put(CallLogDataObject callLogDataObject){
+        String phoneNumber = callLogDataObject.getPhoneNumber();
+        frequencyOfNumbers.put(phoneNumber, frequencyOfNumbers.get(phoneNumber));
+    }
 
 }
