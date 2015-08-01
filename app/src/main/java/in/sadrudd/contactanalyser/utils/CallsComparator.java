@@ -1,5 +1,7 @@
 package in.sadrudd.contactanalyser.utils;
 
+import android.util.Log;
+
 import java.util.Comparator;
 import java.util.Map;
 
@@ -16,7 +18,9 @@ public class CallsComparator implements Comparator<Object>{
 
     public int compare(Object key1, Object key2) {
         Integer val1 = (Integer) mapToSort.get(key1);
+        Log.d("INTEGER", "" + val1);
         Integer val2 = (Integer) mapToSort.get(key2);
+        Log.d("INTEGER2", "" + val2);
         if (val1 < val2) { // Remember...we're sorting in DESCENDING order.
             return 1;
         } else {
