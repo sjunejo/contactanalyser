@@ -3,11 +3,17 @@ package in.sadrudd.contactanalyser;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import java.util.Iterator;
+import java.util.Map;
+
+import in.sadrudd.contactanalyser.data.CallLogDataAccessor;
 
 
 public class ContactAnalyserMainActivity extends AppCompatActivity implements View.OnClickListener{
@@ -16,6 +22,8 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
 
     private Button btnAnalyseCallLog;
     private TextView tvCallLog;
+
+    private static final String TAG = "ContactAnalyser";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +66,7 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.btn_analyse_call_log:
+                analyseCallLogData();
                 tvCallLog.setText("");
                 break;
 
@@ -67,4 +76,19 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
     public Button getBtnAnalyseCallLog(){
         return btnAnalyseCallLog;
     }
+
+    private void analyseCallLogData(){
+        CallLogDataAccessor callLogDataAccessor = new CallLogDataAccessor();
+        Map<String, Integer> uniquePhoneNumbers = callLogDataAccessor.getCallLogData(this)
+                .getAllUniquePhoneNumbersSortedByDescendingFrequency();
+
+        // Print test
+        Iterator<String> it = uniquePhoneNumbers.keySet().iterator();
+        while (it.hasNext()){
+            String currentKey = it.next();
+            Log.d(TAG, currentKey + " " + uniquePhoneNumbers.get(currentKey));
+        }
+
+    }
+
 }
