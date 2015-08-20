@@ -24,6 +24,7 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
     private Button btnAnalyseCallLog;
     private TextView tvCallLog;
 
+    private CallLogDataAccessor callLogDataAccessor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,10 +78,32 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
     }
 
     private void analyseCallLogData(){
-        CallLogDataAccessor callLogDataAccessor = new CallLogDataAccessor();
+        callLogDataAccessor = new CallLogDataAccessor();
         List<PhoneNumberFrequencyObject> uniquePhoneNumbers = callLogDataAccessor.getCallLogData(this)
-                .getAllUniquePhoneNumbersSortedByDescendingFrequency();
+                .getAllUniquePhoneNumbersSortedByAscendingFrequency();
         Log.d(Constants.TAG, uniquePhoneNumbers.toString());
+        prepareRemoveContactsFragment(uniquePhoneNumbers);
+
+    }
+
+    // For now, we're just focusing on contacts with one or zero registered calls
+    private int removeContactsCallThreshold = 1;
+
+    private void prepareRemoveContactsFragment(List<PhoneNumberFrequencyObject> uniquePhoneNumbers){
+        for (PhoneNumberFrequencyObject phoneNumberFrequencyObject: uniquePhoneNumbers){
+            // Check contact
+            if (phoneNumberFrequencyObject.getFrequency() >= 2){
+                break;
+            } else {
+                String contactName = callLogDataAccessor.getContactName(phoneNumberFrequencyObject
+                        .getPhoneNumber());
+                if (!contactName.equals("")){
+                    Log.d(Constants.TAG, contactName);
+                }
+            }
+
+        }
+
     }
 
 }

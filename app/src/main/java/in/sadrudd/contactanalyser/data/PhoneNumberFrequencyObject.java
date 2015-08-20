@@ -11,7 +11,6 @@ public class PhoneNumberFrequencyObject implements Comparable {
     public PhoneNumberFrequencyObject(String phoneNumber, int frequency){
         setPhoneNumber(phoneNumber);
         setFrequency(frequency);
-
     }
 
     public String getPhoneNumber() {
@@ -33,7 +32,7 @@ public class PhoneNumberFrequencyObject implements Comparable {
     @Override
     public int compareTo(Object anotherObject) {
         int otherPhoneNumbersFrequency = ((PhoneNumberFrequencyObject) anotherObject).getFrequency();
-        return otherPhoneNumbersFrequency - this.frequency; // Descending order!
+        return this.frequency - otherPhoneNumbersFrequency; // Descending order!
     }
 
     @Override

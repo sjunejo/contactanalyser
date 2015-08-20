@@ -9,24 +9,27 @@ import android.provider.CallLog;
  */
 public class CallLogDataAccessor {
 
-    private CallLogData callLogData;
+    private CallLogDataContainer callLogDataContainer;
 
     private int indexPhoneNumber;
     private int indexCachedName;
     private int indexCallType;
 
     private String[] columnsFromCallLogToReturn = {
-            CallLog.Calls.CACHED_FORMATTED_NUMBER,
-
+            CallLog.Calls.NUMBER,
             CallLog.Calls.CACHED_NAME,
             CallLog.Calls.TYPE
     };
 
     public CallLogDataAccessor(){
-        callLogData = new CallLogData();
+        callLogDataContainer = new CallLogDataContainer();
     }
 
-    public CallLogData getCallLogData(Context context){
+    public String[] getColumnsFromCallLogToReturn(){
+        return columnsFromCallLogToReturn;
+    }
+
+    public CallLogDataContainer getCallLogData(Context context){
         Cursor cursor = context.getContentResolver().query(CallLog.Calls.CONTENT_URI, null, null, null,
                 null);
         cursor.moveToFirst();
@@ -36,20 +39,28 @@ public class CallLogDataAccessor {
         indexPhoneNumber = cursor.getColumnIndex(CallLog.Calls.CACHED_FORMATTED_NUMBER);
         indexCachedName = cursor.getColumnIndex(CallLog.Calls.CACHED_NAME);
         indexCallType = cursor.getColumnIndex(CallLog.Calls.TYPE);
-
         while (cursor.moveToNext()){
             // If it's a missed call, don't add it to the call log.
+            // Also, Unknown numbers shouldn't be analysed
             int callType = cursor.getInt(indexCallType);
-            if (indexCallType != CallLog.Calls.MISSED_TYPE){
+            if (indexCallType != CallLog.Calls.MISSED_TYPE && !cursor.isNull(indexPhoneNumber)){
                 CallLogDataObject callLogDataObject = new CallLogDataObject();
                 callLogDataObject.setPhoneNumber(cursor.getString(indexPhoneNumber));
-                callLogDataObject.setContactName(cursor.getString(indexCachedName));
+                if (!cursor.isNull(indexCachedName))
+                    callLogDataObject.setContactName(cursor.getString(indexCachedName));
+                else
+                    callLogDataObject.setContactName("");
                 callLogDataObject.setCallType(callType);
-                callLogData.put(callLogDataObject);
+                callLogDataContainer.put(callLogDataObject);
             }
         }
         cursor.close();
-        return callLogData;
+        return callLogDataContainer;
+    }
+
+    // TODO Add exception to throw
+    public String getContactName(String phoneNumber){
+        return callLogDataContainer.getContactForPhoneNumber(phoneNumber);
     }
 
 
