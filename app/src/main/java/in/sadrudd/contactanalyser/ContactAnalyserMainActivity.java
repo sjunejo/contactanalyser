@@ -98,7 +98,7 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
                 String contactName = callLogDataAccessor.getContactName(phoneNumberFrequencyObject
                         .getPhoneNumber());
                 if (!contactName.equals("")){
-                    Log.d(Constants.TAG, contactName);
+                    Log.d(Constants.TAG, contactName + ": " + phoneNumberFrequencyObject.getPhoneNumber());
                 }
             }
 
