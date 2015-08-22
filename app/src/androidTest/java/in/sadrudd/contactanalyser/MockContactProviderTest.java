@@ -22,11 +22,13 @@ public class MockContactProviderTest extends AndroidTestCase {
 
     public void testMockPhoneNumbersFromContacts(){
         // Mock data goes here. TODO complete mock data test cases
-        String[] mockData = {"(979) 267-8509", "FRED", ""};
+        String[] mockData = {"(979) 267-8509", "FRANK", "" + CallLog.Calls.OUTGOING_TYPE};
+
+
+
 
         CallLogDataAccessor callLogDataAccessor = new CallLogDataAccessor();
         String[] columnsFromCallLogToReturn = callLogDataAccessor.getColumnsFromCallLogToReturn();
-
 
         MatrixCursor matrixCursor = new MatrixCursor(columnsFromCallLogToReturn);
         matrixCursor.addRow(mockData);
@@ -67,6 +69,5 @@ public class MockContactProviderTest extends AndroidTestCase {
         @Override public ContentResolver getContentResolver() { return contentResolver; }
         @Override public Context getApplicationContext(){ return this; }
     }
-
 
 }

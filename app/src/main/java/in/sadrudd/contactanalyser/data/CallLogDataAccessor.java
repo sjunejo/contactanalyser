@@ -15,10 +15,14 @@ public class CallLogDataAccessor {
     private int indexCachedName;
     private int indexCallType;
 
+    private static final String HEADING_NUMBER = CallLog.Calls.CACHED_NORMALIZED_NUMBER;
+    private static final String HEADING_NAME = CallLog.Calls.CACHED_NAME;
+    private static final String HEADING_TYPE = CallLog.Calls.TYPE;
+
     private String[] columnsFromCallLogToReturn = {
-            CallLog.Calls.NUMBER,
-            CallLog.Calls.CACHED_NAME,
-            CallLog.Calls.TYPE
+            HEADING_NUMBER,
+            HEADING_NAME,
+            HEADING_TYPE
     };
 
     public CallLogDataAccessor(){
@@ -36,14 +40,15 @@ public class CallLogDataAccessor {
         int[] columnIndexes = new int[columnsFromCallLogToReturn.length];
 
         // Get indices
-        indexPhoneNumber = cursor.getColumnIndex(CallLog.Calls.CACHED_FORMATTED_NUMBER);
-        indexCachedName = cursor.getColumnIndex(CallLog.Calls.CACHED_NAME);
-        indexCallType = cursor.getColumnIndex(CallLog.Calls.TYPE);
+        indexPhoneNumber = cursor.getColumnIndex(HEADING_NUMBER);
+        indexCachedName = cursor.getColumnIndex(HEADING_NAME);
+        indexCallType = cursor.getColumnIndex(HEADING_TYPE);
+
         while (cursor.moveToNext()){
             // If it's a missed call, don't add it to the call log.
             // Also, Unknown numbers shouldn't be analysed
             int callType = cursor.getInt(indexCallType);
-            if (indexCallType != CallLog.Calls.MISSED_TYPE && !cursor.isNull(indexPhoneNumber)){
+            if (callType != CallLog.Calls.MISSED_TYPE && !cursor.isNull(indexPhoneNumber)){
                 CallLogDataObject callLogDataObject = new CallLogDataObject();
                 callLogDataObject.setPhoneNumber(cursor.getString(indexPhoneNumber));
                 if (!cursor.isNull(indexCachedName))
@@ -51,6 +56,8 @@ public class CallLogDataAccessor {
                 else
                     callLogDataObject.setContactName("");
                 callLogDataObject.setCallType(callType);
+
+                // Log.d(Constants.TAG, "PHONE NUMBER AND TYPE: " + callLogDataObject.getPhoneNumber() + " ---- " + callType);
                 callLogDataContainer.put(callLogDataObject);
             }
         }
@@ -62,7 +69,5 @@ public class CallLogDataAccessor {
     public String getContactName(String phoneNumber){
         return callLogDataContainer.getContactForPhoneNumber(phoneNumber);
     }
-
-
 
 }

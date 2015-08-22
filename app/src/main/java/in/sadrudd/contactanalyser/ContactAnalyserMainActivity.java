@@ -10,7 +10,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import in.sadrudd.contactanalyser.data.CallLogDataAccessor;
 import in.sadrudd.contactanalyser.data.PhoneNumberFrequencyObject;
@@ -32,7 +34,6 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
         setContentView(R.layout.activity_decluttr_main);
         initialiseMainFragment();
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -83,13 +84,18 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
                 .getAllUniquePhoneNumbersSortedByAscendingFrequency();
         Log.d(Constants.TAG, uniquePhoneNumbers.toString());
         prepareRemoveContactsFragment(uniquePhoneNumbers);
-
     }
 
     // For now, we're just focusing on contacts with one or zero registered calls
     private int removeContactsCallThreshold = 1;
 
     private void prepareRemoveContactsFragment(List<PhoneNumberFrequencyObject> uniquePhoneNumbers){
+        Set<String> setOfContacts = new LinkedHashSet<String>();
+        setOfContacts.addAll(getContactsWithFewRegisteredCalls(uniquePhoneNumbers));
+    }
+
+    public Set<String> getContactsWithFewRegisteredCalls(List<PhoneNumberFrequencyObject> uniquePhoneNumbers){
+        Set<String> contactsWithFewRegisteredCalls = new LinkedHashSet<String>();
         for (PhoneNumberFrequencyObject phoneNumberFrequencyObject: uniquePhoneNumbers){
             // Check contact
             if (phoneNumberFrequencyObject.getFrequency() >= 2){
@@ -98,12 +104,18 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
                 String contactName = callLogDataAccessor.getContactName(phoneNumberFrequencyObject
                         .getPhoneNumber());
                 if (!contactName.equals("")){
+                    contactsWithFewRegisteredCalls.add(contactName);
                     Log.d(Constants.TAG, contactName + ": " + phoneNumberFrequencyObject.getPhoneNumber());
                 }
             }
-
         }
-
+        return contactsWithFewRegisteredCalls;
     }
+
+
+    public Set<String> getContactsWithNoRegisteredCalls(){
+        return null;
+    }
+
 
 }
