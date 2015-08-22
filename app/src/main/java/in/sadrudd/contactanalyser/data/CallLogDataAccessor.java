@@ -3,6 +3,10 @@ package in.sadrudd.contactanalyser.data;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.CallLog;
+import android.provider.ContactsContract;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Created by sjunjo on 30/07/15.
@@ -24,6 +28,8 @@ public class CallLogDataAccessor {
             HEADING_NAME,
             HEADING_TYPE
     };
+
+    private String[] contactDataProjection = {ContactsContract.Contacts.DISPLAY_NAME };
 
     public CallLogDataAccessor(){
         callLogDataContainer = new CallLogDataContainer();
@@ -68,6 +74,18 @@ public class CallLogDataAccessor {
     // TODO Add exception to throw
     public String getContactName(String phoneNumber){
         return callLogDataContainer.getContactForPhoneNumber(phoneNumber);
+    }
+
+    public Set<String> getContactNames(Context context){
+        Set<String> setOfContactNames = new LinkedHashSet<String>();
+        Cursor cursor = context.getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, null, null,
+                null);
+        cursor.moveToFirst();
+        while (cursor.moveToNext()){
+            setOfContactNames.add(cursor.getString(0));
+        }
+        cursor.close();
+        return setOfContactNames;
     }
 
 }

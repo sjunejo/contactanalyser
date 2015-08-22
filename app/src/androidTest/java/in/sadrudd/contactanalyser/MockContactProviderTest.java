@@ -24,9 +24,6 @@ public class MockContactProviderTest extends AndroidTestCase {
         // Mock data goes here. TODO complete mock data test cases
         String[] mockData = {"(979) 267-8509", "FRANK", "" + CallLog.Calls.OUTGOING_TYPE};
 
-
-
-
         CallLogDataAccessor callLogDataAccessor = new CallLogDataAccessor();
         String[] columnsFromCallLogToReturn = callLogDataAccessor.getColumnsFromCallLogToReturn();
 

@@ -92,6 +92,7 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
     private void prepareRemoveContactsFragment(List<PhoneNumberFrequencyObject> uniquePhoneNumbers){
         Set<String> setOfContacts = new LinkedHashSet<String>();
         setOfContacts.addAll(getContactsWithFewRegisteredCalls(uniquePhoneNumbers));
+        setOfContacts.addAll(getContactsWithNoRegisteredCalls(setOfContacts));
     }
 
     public Set<String> getContactsWithFewRegisteredCalls(List<PhoneNumberFrequencyObject> uniquePhoneNumbers){
@@ -112,9 +113,12 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
         return contactsWithFewRegisteredCalls;
     }
 
-
-    public Set<String> getContactsWithNoRegisteredCalls(){
-        return null;
+    public Set<String> getContactsWithNoRegisteredCalls(Set<String> contactsWithPhoneNumbers){
+        Set<String> contactsWithNoPhoneNumbers = callLogDataAccessor.getContactNames(this);
+        contactsWithNoPhoneNumbers.removeAll(contactsWithPhoneNumbers);
+        Log.d(Constants.TAG, "Contacts with no Calls:");
+        Log.d(Constants.TAG, contactsWithNoPhoneNumbers.toString());
+        return contactsWithNoPhoneNumbers;
     }
 
 
