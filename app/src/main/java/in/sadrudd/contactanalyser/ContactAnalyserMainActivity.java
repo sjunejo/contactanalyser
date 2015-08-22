@@ -92,7 +92,9 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
     private void prepareRemoveContactsFragment(List<PhoneNumberFrequencyObject> uniquePhoneNumbers){
         Set<String> setOfContacts = new LinkedHashSet<String>();
         setOfContacts.addAll(getContactsWithFewRegisteredCalls(uniquePhoneNumbers));
-        setOfContacts.addAll(getContactsWithNoRegisteredCalls(setOfContacts));
+        setOfContacts.addAll(getContactsWithNoRegisteredCalls(uniquePhoneNumbers));
+
+        // TODO display set as list
     }
 
     public Set<String> getContactsWithFewRegisteredCalls(List<PhoneNumberFrequencyObject> uniquePhoneNumbers){
@@ -113,12 +115,21 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
         return contactsWithFewRegisteredCalls;
     }
 
-    public Set<String> getContactsWithNoRegisteredCalls(Set<String> contactsWithPhoneNumbers){
-        Set<String> contactsWithNoPhoneNumbers = callLogDataAccessor.getContactNames(this);
-        contactsWithNoPhoneNumbers.removeAll(contactsWithPhoneNumbers);
-        Log.d(Constants.TAG, "Contacts with no Calls:");
-        Log.d(Constants.TAG, contactsWithNoPhoneNumbers.toString());
-        return contactsWithNoPhoneNumbers;
+    public Set<String> getContactsWithNoRegisteredCalls(List<PhoneNumberFrequencyObject> uniquePhoneNumbers){
+        Set<String> contactsWithNoPhoneCalls = callLogDataAccessor.getContactNames(this);
+        Log.d(Constants.TAG, "Contacts with no Calls: BEFORE");
+        Log.d(Constants.TAG, contactsWithNoPhoneCalls.toString());
+        Set<String> contactsWithPhoneCalls = new LinkedHashSet<String>();
+        // Get phone numbers associated with ALL names..)
+        for (PhoneNumberFrequencyObject phoneNumberFrequencyObject: uniquePhoneNumbers){
+            String contactName = callLogDataAccessor.getContactName(phoneNumberFrequencyObject.getPhoneNumber());
+            if (!contactName.equals(""))
+                contactsWithPhoneCalls.add(contactName);
+        }
+        contactsWithNoPhoneCalls.removeAll(contactsWithPhoneCalls);
+        Log.d(Constants.TAG, "Contacts with no Calls: AFTER");
+        Log.d(Constants.TAG, contactsWithNoPhoneCalls.toString());
+        return contactsWithNoPhoneCalls;
     }
 
 

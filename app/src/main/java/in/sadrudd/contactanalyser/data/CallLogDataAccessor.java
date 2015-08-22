@@ -78,8 +78,9 @@ public class CallLogDataAccessor {
 
     public Set<String> getContactNames(Context context){
         Set<String> setOfContactNames = new LinkedHashSet<String>();
-        Cursor cursor = context.getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, null, null,
-                null);
+        Cursor cursor = context.getContentResolver().query(ContactsContract.Contacts.CONTENT_URI,
+                new String[]{ContactsContract.Contacts.DISPLAY_NAME},
+                ContactsContract.Contacts.HAS_PHONE_NUMBER, null, null);
         cursor.moveToFirst();
         while (cursor.moveToNext()){
             setOfContactNames.add(cursor.getString(0));
