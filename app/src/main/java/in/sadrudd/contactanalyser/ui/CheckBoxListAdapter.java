@@ -6,18 +6,25 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
+
+import java.util.Set;
+import java.util.TreeSet;
 
 import in.sadrudd.contactanalyser.R;
 
 /**
  * Created by sjunjo on 23/08/15.
  */
-public class CheckBoxListAdapter extends ArrayAdapter<String> {
+public class CheckBoxListAdapter extends ArrayAdapter<String> implements CompoundButton.OnCheckedChangeListener {
 
     private String[] data;
 
+    private Set<String> setOfContactsCheckedForRemoval;
+
     public CheckBoxListAdapter(Context context, int resource) {
         super(context, resource);
+        setOfContactsCheckedForRemoval = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
     }
 
     public CheckBoxListAdapter(Context context, String[] data){
@@ -33,8 +40,21 @@ public class CheckBoxListAdapter extends ArrayAdapter<String> {
         }
         String str = getItem(position);
         CheckBox cbContact = (CheckBox) v.findViewById(R.id.cb_contact);
+        cbContact.setOnCheckedChangeListener(this);
         cbContact.setText(str);
-
         return v;
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        String contactName = buttonView.getText().toString();
+        if (isChecked)
+            setOfContactsCheckedForRemoval.add(contactName);
+        else
+            setOfContactsCheckedForRemoval.remove(contactName);
+    }
+
+    public Set<String> getSetOfContactsCheckedForRemoval(){
+        return setOfContactsCheckedForRemoval;
     }
 }

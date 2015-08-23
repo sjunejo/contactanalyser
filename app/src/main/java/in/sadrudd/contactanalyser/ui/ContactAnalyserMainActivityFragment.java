@@ -21,6 +21,7 @@ public class ContactAnalyserMainActivityFragment extends Fragment  {
     public interface OnMainFragmentLoadedListener {
         public void onMainFragmentLoaded();
     }
+
     public ContactAnalyserMainActivityFragment() {
     }
 
@@ -34,7 +35,7 @@ public class ContactAnalyserMainActivityFragment extends Fragment  {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.d(Constants.TAG, "Fragment loaded and attached");
+        Log.d(Constants.TAG, "Main fragment loaded and attached");
         try {
             callback = (OnMainFragmentLoadedListener) getActivity();
             callback.onMainFragmentLoaded();

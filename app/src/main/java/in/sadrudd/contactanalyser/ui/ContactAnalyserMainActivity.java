@@ -24,10 +24,14 @@ import in.sadrudd.contactanalyser.data.PhoneNumberFrequencyObject;
 import in.sadrudd.contactanalyser.utils.Constants;
 
 
-public class ContactAnalyserMainActivity extends AppCompatActivity implements View.OnClickListener, ContactAnalyserMainActivityFragment.OnMainFragmentLoadedListener {
-
+public class ContactAnalyserMainActivity extends AppCompatActivity implements View.OnClickListener,
+        ContactAnalyserMainActivityFragment.OnMainFragmentLoadedListener,
+        RemoveContactsFragment.OnRemoveContactsFragmentLoadedListener {
 
     private Button btnAnalyseCallLog;
+    private Button btnRemoveContacts;
+
+
     private TextView tvCallLog;
 
     private CallLogDataAccessor callLogDataAccessor;
@@ -36,6 +40,7 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
     private ViewPager viewPager;
     private PagerAdapter pagerAdapter;
 
+    private boolean removeContactsFragmentCreated = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +86,32 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
                 analyseCallLogData();
                 tvCallLog.setText("");
                 break;
+            case R.id.btn_remove_contacts:
+                removeContactsButtonPressed();
+                break;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (viewPager.getCurrentItem() == 0){
+            super.onBackPressed();
+        } else {
+            viewPager.setCurrentItem(viewPager.getCurrentItem() - 1);
+        }
+    }
+
+    @Override
+    public void onMainFragmentLoaded() {
+        btnAnalyseCallLog = (Button) findViewById(R.id.btn_analyse_call_log);
+        btnAnalyseCallLog.setOnClickListener(this);
+        tvCallLog = (TextView) findViewById(R.id.tv_call_log);
+    }
+
+    @Override
+    public void onRemoveContactsFragmentLoaded() {
+        btnRemoveContacts = (Button) findViewById(R.id.btn_remove_contacts);
+        btnRemoveContacts.setOnClickListener(this);
     }
 
     public Button getBtnAnalyseCallLog(){
@@ -94,30 +124,39 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
                 .getAllUniquePhoneNumbersSortedByAscendingFrequency();
         Log.d(Constants.TAG, uniquePhoneNumbers.toString());
         prepareRemoveContactsFragment(uniquePhoneNumbers);
-
-
     }
-
-    // For now, we're just focusing on contacts with one or zero registered calls
-    private int removeContactsCallThreshold = 1;
 
     private void prepareRemoveContactsFragment(List<PhoneNumberFrequencyObject> uniquePhoneNumbers){
         Set<String> setOfContactsToConsiderRemoving = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
         setOfContactsToConsiderRemoving.addAll(getContactsWithFewRegisteredCalls(uniquePhoneNumbers));
         setOfContactsToConsiderRemoving.addAll(getContactsWithNoRegisteredCalls(uniquePhoneNumbers));
         Log.d(Constants.TAG, setOfContactsToConsiderRemoving.toString());
-        // TODO display set as list
 
         Bundle args = new Bundle();
-        args.putStringArray(RemoveContactsFragment.ARGS_KEY, (String[]) setOfContactsToConsiderRemoving.toArray());
-        fragments.add(Fragment.instantiate(this, RemoveContactsFragment.class.getName(), args));
+
+        String[] contacts = setOfContactsToConsiderRemoving.toArray(new String[setOfContactsToConsiderRemoving.size()]);
+        args.putStringArray(RemoveContactsFragment.ARGS_KEY,
+                contacts);
+        if (!removeContactsFragmentCreated){
+            fragments.add(Fragment.instantiate(this, RemoveContactsFragment.class.getName(), args));
+            pagerAdapter.notifyDataSetChanged();
+            removeContactsFragmentCreated = true;
+        }
+         else {
+            ((RemoveContactsFragment) fragments.get(Constants.FRAGMENT_REMOVE_CONTACTS)).setContacts(contacts);
+        }
+        viewPager.setCurrentItem(viewPager.getCurrentItem()+1, true);
     }
+
+
+    // For now, we're just focusing on contacts with one or zero registered calls
+    private int removeContactsCallThreshold = 2;
 
     public Set<String> getContactsWithFewRegisteredCalls(List<PhoneNumberFrequencyObject> uniquePhoneNumbers){
         Set<String> contactsWithFewRegisteredCalls = new LinkedHashSet<String>();
         for (PhoneNumberFrequencyObject phoneNumberFrequencyObject: uniquePhoneNumbers){
             // Check contact
-            if (phoneNumberFrequencyObject.getFrequency() >= 2){
+            if (phoneNumberFrequencyObject.getFrequency() >= removeContactsCallThreshold){
                 break;
             } else {
                 String contactName = callLogDataAccessor.getContactName(phoneNumberFrequencyObject
@@ -148,10 +187,8 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
         return contactsWithNoPhoneCalls;
     }
 
-    @Override
-    public void onMainFragmentLoaded() {
-        btnAnalyseCallLog = (Button) findViewById(R.id.btn_analyse_call_log);
-        btnAnalyseCallLog.setOnClickListener(this);
-        tvCallLog = (TextView) findViewById(R.id.tv_call_log);
+    private void removeContactsButtonPressed(){
+        Log.d(Constants.TAG, "PROGRESS");
     }
+
 }

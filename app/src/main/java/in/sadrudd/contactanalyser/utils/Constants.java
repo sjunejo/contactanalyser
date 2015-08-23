@@ -9,4 +9,8 @@ public class Constants {
 
     public  static final String TAG = "ContactAnalyser";
 
+    public static final int FRAGMENT_MAIN = 0;
+
+    public static final int FRAGMENT_REMOVE_CONTACTS = 1;
+
 }

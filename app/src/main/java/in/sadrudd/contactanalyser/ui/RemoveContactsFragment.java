@@ -2,30 +2,29 @@ package in.sadrudd.contactanalyser.ui;
 
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.Set;
-
 import in.sadrudd.contactanalyser.R;
+import in.sadrudd.contactanalyser.utils.Constants;
 
 /**
  * Created by sjunjo on 20/08/15.
  */
-public class RemoveContactsFragment extends ListFragment {
+public class RemoveContactsFragment extends ListFragment  {
+
+    private OnRemoveContactsFragmentLoadedListener callback;
+
+    public interface OnRemoveContactsFragmentLoadedListener {
+        public void onRemoveContactsFragmentLoaded();
+    }
 
     public static final String ARGS_KEY = "REMOVE_CONTACTS_FRAGMENT";
 
     private String[] contacts;
 
-    // TODO I don't think I actually need this
-    public static RemoveContactsFragment newInstance(Set<String> setOfContacts){
-        final RemoveContactsFragment removeContactsFragment  = new RemoveContactsFragment();
-        final Bundle args = new Bundle();
-        args.putStringArray(ARGS_KEY, (String[]) setOfContacts.toArray());
-        return removeContactsFragment;
-    }
 
     public RemoveContactsFragment() {
 
@@ -47,5 +46,20 @@ public class RemoveContactsFragment extends ListFragment {
         return v;
     }
 
+    public void setContacts(String[] contacts){
+        this.contacts = contacts;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        Log.d(Constants.TAG, "Main fragment loaded and attached");
+        try {
+            callback = (OnRemoveContactsFragmentLoadedListener) getActivity();
+            callback.onRemoveContactsFragmentLoaded();
+        } catch (ClassCastException e){
+            throw new ClassCastException(getActivity().toString() + "must implement OnMainFragmentLoadedListener");
+        }
+    }
 
 }
