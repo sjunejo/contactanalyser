@@ -3,4 +3,5 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="btn_analyse_call_log">Analyse Call Log</string>
+    <string name="btn_remove_contacts">Remove Selected Contacts</string>
 </resources>
