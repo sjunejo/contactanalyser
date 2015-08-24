@@ -1,6 +1,7 @@
 package in.sadrudd.contactanalyser.ui;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,17 +9,21 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
 import in.sadrudd.contactanalyser.R;
+import in.sadrudd.contactanalyser.utils.Constants;
 
 /**
  * Created by sjunjo on 23/08/15.
  */
 public class CheckBoxListAdapter extends ArrayAdapter<String> implements CompoundButton.OnCheckedChangeListener {
 
-    private String[] data;
+    private String[] currentListOfContacts;
     private boolean[] isCheckedArray;
 
     private Set<String> setOfContactsCheckedForRemoval;
@@ -27,9 +32,10 @@ public class CheckBoxListAdapter extends ArrayAdapter<String> implements Compoun
         super(context, resource);
     }
 
-    public CheckBoxListAdapter(Context context, String[] data){
-        super(context, 0, data);
-        isCheckedArray = new boolean[data.length];
+    public CheckBoxListAdapter(Context context, String[] currentListOfContacts){
+        super(context, 0, currentListOfContacts);
+        this.currentListOfContacts = currentListOfContacts;
+        isCheckedArray = new boolean[currentListOfContacts.length];
         setOfContactsCheckedForRemoval = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
     }
 
@@ -53,13 +59,22 @@ public class CheckBoxListAdapter extends ArrayAdapter<String> implements Compoun
         } else {
             holder = (ViewHolder) v.getTag();
         }
+        // BELOW IF STATEMENT IS CHEAP HACK. TODO REPLACE CHEAP HACK
+        if (position < currentListOfContacts.length){
+            String str = currentListOfContacts[position];
+            holder.cbContact.setTag(position);
+            holder.cbContact.setOnCheckedChangeListener(this);
+            holder.cbContact.setText(str);
+            holder.cbContact.setChecked(isCheckedArray[position]);
+        }
 
-        String str = getItem(position);
-        holder.cbContact.setTag(position);
-        holder.cbContact.setOnCheckedChangeListener(this);
-        holder.cbContact.setText(str);
-        holder.cbContact.setChecked(isCheckedArray[position]);
+
         return v;
+    }
+
+    @Override
+    public int getViewTypeCount() {
+        return 1;
     }
 
     @Override
@@ -77,4 +92,26 @@ public class CheckBoxListAdapter extends ArrayAdapter<String> implements Compoun
         return setOfContactsCheckedForRemoval.toArray(
                 new String[setOfContactsCheckedForRemoval.size()]);
     }
+
+    public void removeFromContactsList(String[] contactsRemoved){
+        List<String> tempArrayList = new ArrayList<String>();
+        List<String> tempArrayList2 = new ArrayList<String>();
+        // contactsRemoved is never going to be larger than currentListOfContacts!!
+        // We can abuse this by only having the equivalent of a single loop.
+        for (int i = 0; i < contactsRemoved.length; i++){
+            tempArrayList2.add(contactsRemoved[i]);
+            tempArrayList.add(currentListOfContacts[i]);
+        }
+        for (int i = contactsRemoved.length; i < currentListOfContacts.length; i++){
+            tempArrayList.add(currentListOfContacts[i]);
+        }
+        tempArrayList.removeAll(tempArrayList2);
+        this.currentListOfContacts = tempArrayList.toArray(new String[tempArrayList.size()]);
+        this.notifyDataSetChanged();
+        Log.d(Constants.TAG, "CLOC: " + Arrays.toString(currentListOfContacts));
+        isCheckedArray = new boolean[currentListOfContacts.length];
+        setOfContactsCheckedForRemoval = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+    }
+
+
 }

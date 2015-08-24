@@ -5,8 +5,8 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -190,27 +191,35 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
     }
 
     private void removeContactsButtonPressed(){
-        CheckBoxListAdapter checkBoxListAdapter = (CheckBoxListAdapter) ((RemoveContactsFragment)
-                fragments.get(Constants.FRAGMENT_REMOVE_CONTACTS)).
-                getListAdapter();
-        String[] contactsToRemove = checkBoxListAdapter.getSetOfContactsCheckedForRemoval();
+        String[] contactsToRemove = getCheckBoxListAdapter(Constants.FRAGMENT_REMOVE_CONTACTS)
+                .getSetOfContactsCheckedForRemoval();
         createAreYouSureDialogue(contactsToRemove);
         // ARE YOU SURE??
     }
 
-    private void createAreYouSureDialogue(String[] contactsToRemove){
+    public CheckBoxListAdapter getCheckBoxListAdapter(int fragmentID){
+        return  (CheckBoxListAdapter) ((RemoveContactsFragment)
+                fragments.get(Constants.FRAGMENT_REMOVE_CONTACTS)).
+                getListAdapter();
+    }
 
+    private void createAreYouSureDialogue(final String[] contactsToRemove){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Deleting: ");
+        stringBuilder.append("Deleting:\n\n");
         for (String contact: contactsToRemove){
             stringBuilder.append(contact + "\n");
         }
-        stringBuilder.append("\nAre you sure?");
+        stringBuilder.append("\n\nAre you sure?");
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE:
+                        callLogDataAccessor.deleteSelectedContacts(ContactAnalyserMainActivity.this,
+                                contactsToRemove);
+                        ArrayList<String> arrayListForRemovingContact = new ArrayList<String>();
+                        getCheckBoxListAdapter(Constants.FRAGMENT_REMOVE_CONTACTS)
+                                .removeFromContactsList(contactsToRemove);
                         //Yes button clicked
                         break;
 
@@ -225,5 +234,6 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
         builder.setMessage(stringBuilder.toString()).setPositiveButton("Yes", dialogClickListener)
                 .setNegativeButton("No", dialogClickListener).show();
     }
+
 
 }

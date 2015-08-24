@@ -25,7 +25,6 @@ public class RemoveContactsFragment extends ListFragment  {
 
     private String[] contacts;
 
-
     public RemoveContactsFragment() {
 
     }
