@@ -68,7 +68,6 @@ public class CheckBoxListAdapter extends ArrayAdapter<String> implements Compoun
             holder.cbContact.setChecked(isCheckedArray[position]);
         }
 
-
         return v;
     }
 

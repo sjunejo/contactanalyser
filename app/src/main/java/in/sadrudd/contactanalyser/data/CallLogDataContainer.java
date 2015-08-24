@@ -28,6 +28,8 @@ public class CallLogDataContainer {
     public void put(CallLogDataObject callLogDataObject){
         String phoneNumber = callLogDataObject.getPhoneNumber();
         contactsHashMap.put(phoneNumber, callLogDataObject.getContactName());
+        // To begin with, there won't be any key/value pairs in the hash map.
+        // Can't increment what isn't there...
         if (!frequencyOfNumbers.containsKey(phoneNumber))
             frequencyOfNumbers.put(phoneNumber, 1);
         else
@@ -37,7 +39,7 @@ public class CallLogDataContainer {
 
     /**
      * Iterate through HashMap 'frequency of numbers' to produce a list of phone numbers
-     * sorted in descending order, in terms of the sum of incoming/outgoing calls.
+     * sorted in ascending order, in terms of the sum of incoming/outgoing calls.
      **/
     public List<PhoneNumberFrequencyObject> getAllUniquePhoneNumbersSortedByAscendingFrequency(){
         List<PhoneNumberFrequencyObject> frequenciesAndNumbers =
@@ -70,5 +72,6 @@ public class CallLogDataContainer {
 
     public String getContactForPhoneNumber(String phoneNumber){
         return contactsHashMap.get(phoneNumber);
+
     }
 }

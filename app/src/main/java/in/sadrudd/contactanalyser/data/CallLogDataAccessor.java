@@ -43,6 +43,12 @@ public class CallLogDataAccessor {
         return columnsFromCallLogToReturn;
     }
 
+    /**
+     * Gets ALL call log data from appropriate content provider
+     * and places it into the Call Log Data Container object.
+     * @param context the context (of the activity, not application!)
+     * @return
+     */
     public CallLogDataContainer getCallLogData(Context context){
         Cursor cursor = context.getContentResolver().query(CallLog.Calls.CONTENT_URI, null, null, null,
                 null);
