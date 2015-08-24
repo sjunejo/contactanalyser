@@ -1,10 +1,12 @@
 package in.sadrudd.contactanalyser.ui;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -188,7 +190,40 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
     }
 
     private void removeContactsButtonPressed(){
-        Log.d(Constants.TAG, "PROGRESS");
+        CheckBoxListAdapter checkBoxListAdapter = (CheckBoxListAdapter) ((RemoveContactsFragment)
+                fragments.get(Constants.FRAGMENT_REMOVE_CONTACTS)).
+                getListAdapter();
+        String[] contactsToRemove = checkBoxListAdapter.getSetOfContactsCheckedForRemoval();
+        createAreYouSureDialogue(contactsToRemove);
+        // ARE YOU SURE??
+    }
+
+    private void createAreYouSureDialogue(String[] contactsToRemove){
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Deleting: ");
+        for (String contact: contactsToRemove){
+            stringBuilder.append(contact + "\n");
+        }
+        stringBuilder.append("\nAre you sure?");
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        //Yes button clicked
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        //No button clicked
+                        break;
+                }
+            }
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(stringBuilder.toString()).setPositiveButton("Yes", dialogClickListener)
+                .setNegativeButton("No", dialogClickListener).show();
     }
 
 }
