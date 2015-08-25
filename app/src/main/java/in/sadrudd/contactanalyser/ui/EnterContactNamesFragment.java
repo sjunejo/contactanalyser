@@ -11,47 +11,41 @@ import in.sadrudd.contactanalyser.R;
 import in.sadrudd.contactanalyser.utils.Constants;
 
 /**
- * Created by sjunjo on 20/08/15.
+ * Created by sjunjo on 25/08/15.
  */
-public class RemoveContactsFragment extends ListFragment  {
+public class EnterContactNamesFragment extends ListFragment {
+    private String[] phoneNumbers;
 
-    private OnRemoveContactsFragmentLoadedListener callback;
+    private EnterContactNamesFragmentListener callback;
 
-    public interface OnRemoveContactsFragmentLoadedListener {
-        public void onRemoveContactsFragmentLoaded();
+    public interface EnterContactNamesFragmentListener {
+        public void onEnterContactNamesFragmentLoaded();
     }
 
-    public static final String ARGS_KEY = "REMOVE_CONTACTS_FRAGMENT";
-
-    private String[] contacts;
-
-    public RemoveContactsFragment() {
-
-    }
+    public static final String ARGS_KEY = "ADD_CONTACTS_TEXTVIEW";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        contacts = getArguments().getStringArray(ARGS_KEY);
-
+        phoneNumbers = getArguments().getStringArray(ARGS_KEY);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_remove_contacts, container, false);
+        View v = inflater.inflate(R.layout.fragment_add_contact_textviews, container, false);
 
-        setListAdapter(new CheckBoxListAdapter(getActivity(), contacts));
+        // setListAdapter(new CheckBoxListAdapter(getActivity(), phoneNumbers));
         return v;
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.d(Constants.TAG, "RemoveContacts fragment loaded and attached");
+        Log.d(Constants.TAG, "AddContacts fragment loaded and attached");
         try {
-            callback = (OnRemoveContactsFragmentLoadedListener) getActivity();
-            callback.onRemoveContactsFragmentLoaded();
+            callback = (EnterContactNamesFragmentListener) getActivity();
+            callback.onEnterContactNamesFragmentLoaded();
         } catch (ClassCastException e){
             throw new ClassCastException(getActivity().toString() + "must implement OnMainFragmentLoadedListener");
         }

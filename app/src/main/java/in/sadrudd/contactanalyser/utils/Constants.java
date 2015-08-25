@@ -13,4 +13,6 @@ public class Constants {
 
     public static final int FRAGMENT_REMOVE_CONTACTS = 1;
 
+    public static final int FRAGMENT_ADD_CONTACTS = 2;
+
 }

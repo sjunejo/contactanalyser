@@ -23,24 +23,24 @@ import in.sadrudd.contactanalyser.utils.Constants;
  */
 public class CheckBoxListAdapter extends ArrayAdapter<String> implements CompoundButton.OnCheckedChangeListener {
 
-    private String[] currentListOfContacts;
+    private String[] currentListViewItems;
     private boolean[] isCheckedArray;
 
-    private Set<String> setOfContactsCheckedForRemoval;
+    private Set<String> itemsChecked;
 
     public CheckBoxListAdapter(Context context, int resource) {
         super(context, resource);
     }
 
-    public CheckBoxListAdapter(Context context, String[] currentListOfContacts){
-        super(context, 0, currentListOfContacts);
-        this.currentListOfContacts = currentListOfContacts;
-        isCheckedArray = new boolean[currentListOfContacts.length];
-        setOfContactsCheckedForRemoval = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+    public CheckBoxListAdapter(Context context, String[] currentListViewItems){
+        super(context, 0, currentListViewItems);
+        this.currentListViewItems = currentListViewItems;
+        isCheckedArray = new boolean[currentListViewItems.length];
+        itemsChecked = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
     }
 
     static class ViewHolder {
-        CheckBox cbContact;
+        CheckBox cbData;
         boolean isSelected;
         String text;
     }
@@ -54,18 +54,18 @@ public class CheckBoxListAdapter extends ArrayAdapter<String> implements Compoun
             holder = new ViewHolder();
             LayoutInflater layoutInflater = LayoutInflater.from(getContext());
             v = layoutInflater.inflate(R.layout.listview_checkbox, null);
-            holder.cbContact = (CheckBox) v.findViewById(R.id.cb_contact);
+            holder.cbData = (CheckBox) v.findViewById(R.id.cb_contact);
             v.setTag(holder);
         } else {
             holder = (ViewHolder) v.getTag();
         }
         // BELOW IF STATEMENT IS CHEAP HACK. TODO REPLACE CHEAP HACK
-        if (position < currentListOfContacts.length){
-            String str = currentListOfContacts[position];
-            holder.cbContact.setTag(position);
-            holder.cbContact.setOnCheckedChangeListener(this);
-            holder.cbContact.setText(str);
-            holder.cbContact.setChecked(isCheckedArray[position]);
+        if (position < currentListViewItems.length){
+            String str = currentListViewItems[position];
+            holder.cbData.setTag(position);
+            holder.cbData.setOnCheckedChangeListener(this);
+            holder.cbData.setText(str);
+            holder.cbData.setChecked(isCheckedArray[position]);
         }
 
         return v;
@@ -82,34 +82,34 @@ public class CheckBoxListAdapter extends ArrayAdapter<String> implements Compoun
         int position = (Integer) buttonView.getTag();
         isCheckedArray[position] = buttonView.isChecked();
         if (isChecked)
-            setOfContactsCheckedForRemoval.add(contactName);
+            itemsChecked.add(contactName);
         else
-            setOfContactsCheckedForRemoval.remove(contactName);
+            itemsChecked.remove(contactName);
     }
 
-    public String[] getSetOfContactsCheckedForRemoval(){
-        return setOfContactsCheckedForRemoval.toArray(
-                new String[setOfContactsCheckedForRemoval.size()]);
+    public String[] getCheckBoxItemsChecked(){
+        return itemsChecked.toArray(
+                new String[itemsChecked.size()]);
     }
 
-    public void removeFromContactsList(String[] contactsRemoved){
+    public void removeFromListView(String[] itemsRemoved){
         List<String> tempArrayList = new ArrayList<String>();
         List<String> tempArrayList2 = new ArrayList<String>();
-        // contactsRemoved is never going to be larger than currentListOfContacts!!
+        // itemsRemoved is never going to be larger than currentListViewItems!!
         // We can abuse this by only having the equivalent of a single loop.
-        for (int i = 0; i < contactsRemoved.length; i++){
-            tempArrayList2.add(contactsRemoved[i]);
-            tempArrayList.add(currentListOfContacts[i]);
+        for (int i = 0; i < itemsRemoved.length; i++){
+            tempArrayList2.add(itemsRemoved[i]);
+            tempArrayList.add(currentListViewItems[i]);
         }
-        for (int i = contactsRemoved.length; i < currentListOfContacts.length; i++){
-            tempArrayList.add(currentListOfContacts[i]);
+        for (int i = itemsRemoved.length; i < currentListViewItems.length; i++){
+            tempArrayList.add(currentListViewItems[i]);
         }
         tempArrayList.removeAll(tempArrayList2);
-        this.currentListOfContacts = tempArrayList.toArray(new String[tempArrayList.size()]);
+        this.currentListViewItems = tempArrayList.toArray(new String[tempArrayList.size()]);
         this.notifyDataSetChanged();
-        Log.d(Constants.TAG, "CLOC: " + Arrays.toString(currentListOfContacts));
-        isCheckedArray = new boolean[currentListOfContacts.length];
-        setOfContactsCheckedForRemoval = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+        Log.d(Constants.TAG, "CLOC: " + Arrays.toString(currentListViewItems));
+        isCheckedArray = new boolean[currentListViewItems.length];
+        itemsChecked = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
     }
 
 

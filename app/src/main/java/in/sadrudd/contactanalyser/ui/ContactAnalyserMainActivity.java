@@ -3,6 +3,7 @@ package in.sadrudd.contactanalyser.ui;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.ListFragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
@@ -15,6 +16,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -96,6 +98,8 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
                 removeContactsButtonPressed();
                 break;
             case R.id.btn_add_contacts:
+                addContactsButtonPressed();
+                break;
         }
     }
 
@@ -138,13 +142,14 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
         Log.d(Constants.TAG, uniquePhoneNumbers.toString());
         partitionCallLogData(uniquePhoneNumbers);
         prepareRemoveContactsFragment(uniquePhoneNumbers);
+        prepareAddContactsFragment();
     }
 
     // For now, we're just focusing on contacts with one or zero registered calls
     private int removeContactsCallThreshold = 2;
 
     private Set<String> contactsWithFewRegisteredCalls;
-    private Set<String> phoneNumbersGreaterRegisteredCalls;
+    private Set<String> phoneNumbersWithSubstantialRegisteredCalls;
 
     /**
      * One loop through PhoneNumber/Frequency pairs should be enough to determine
@@ -154,7 +159,7 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
      */
     private void partitionCallLogData(List<PhoneNumberFrequencyObject> uniquePhoneNumbers){
         contactsWithFewRegisteredCalls = new LinkedHashSet<String>();
-        phoneNumbersGreaterRegisteredCalls = new LinkedHashSet<String>();
+        phoneNumbersWithSubstantialRegisteredCalls = new LinkedHashSet<String>();
         int count;
         for (count = 0; count < uniquePhoneNumbers.size(); count++){
             PhoneNumberFrequencyObject phoneNumberFrequencyObject = uniquePhoneNumbers.get(count);
@@ -175,7 +180,7 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
             String contactName = callLogDataAccessor.getContactName(phoneNumberFrequencyObject
                     .getPhoneNumber());
             if (contactName.equals("")){
-                phoneNumbersGreaterRegisteredCalls.add(phoneNumberFrequencyObject.getPhoneNumber());
+                phoneNumbersWithSubstantialRegisteredCalls.add(phoneNumberFrequencyObject.getPhoneNumber());
                 Log.d(Constants.TAG, "Phone Number: " + phoneNumberFrequencyObject.getPhoneNumber()
                 + " | Frequency: " + phoneNumberFrequencyObject.getFrequency());
             }
@@ -195,8 +200,8 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
     }
 
     private void prepareAddContactsFragment(){
-        String[] phoneNumbers = phoneNumbersGreaterRegisteredCalls.toArray(
-                new String[phoneNumbersGreaterRegisteredCalls.size()]);
+        String[] phoneNumbers = phoneNumbersWithSubstantialRegisteredCalls.toArray(
+                new String[phoneNumbersWithSubstantialRegisteredCalls.size()]);
         createFragment(phoneNumbers, AddContactsFragment.ARGS_KEY, AddContactsFragment.class.getName(),
                addContactsFragmentCreated);
         viewPager.setCurrentItem(viewPager.getCurrentItem()+1, true);
@@ -232,16 +237,18 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
 
     private void removeContactsButtonPressed(){
         String[] contactsToRemove = getCheckBoxListAdapter(Constants.FRAGMENT_REMOVE_CONTACTS)
-                .getSetOfContactsCheckedForRemoval();
+                .getCheckBoxItemsChecked();
         createAreYouSureDialogue(contactsToRemove);
     }
 
     private void addContactsButtonPressed(){
-
+        String[] phoneNumbersToRemove = getCheckBoxListAdapter(Constants.FRAGMENT_ADD_CONTACTS)
+                .getCheckBoxItemsChecked();
+        Log.d(Constants.TAG, Arrays.toString(phoneNumbersToRemove));
     }
 
     public CheckBoxListAdapter getCheckBoxListAdapter(int fragmentID){
-        return  (CheckBoxListAdapter) ((RemoveContactsFragment)
+        return  (CheckBoxListAdapter) ((ListFragment)
                 fragments.get(fragmentID)).
                 getListAdapter();
     }
@@ -262,7 +269,7 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
                                 contactsToRemove);
                         ArrayList<String> arrayListForRemovingContact = new ArrayList<String>();
                         getCheckBoxListAdapter(Constants.FRAGMENT_REMOVE_CONTACTS)
-                                .removeFromContactsList(contactsToRemove);
+                                .removeFromListView(contactsToRemove);
                         //Yes button clicked
                         break;
 
@@ -272,7 +279,6 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
                 }
             }
         };
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(stringBuilder.toString()).setPositiveButton("Yes", dialogClickListener)
                 .setNegativeButton("No", dialogClickListener).show();

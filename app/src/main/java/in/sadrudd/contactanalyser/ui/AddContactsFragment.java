@@ -33,7 +33,6 @@ public class AddContactsFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         phoneNumbers = getArguments().getStringArray(ARGS_KEY);
-
     }
 
     @Override
@@ -47,7 +46,7 @@ public class AddContactsFragment extends ListFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.d(Constants.TAG, "Main fragment loaded and attached");
+        Log.d(Constants.TAG, "AddContacts fragment loaded and attached");
         try {
             callback = (OnAddContactsFragmentLoadedListener) getActivity();
             callback.onAddContactsFragmentLoaded();
