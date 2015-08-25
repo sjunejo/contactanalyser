@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,7 +33,8 @@ import in.sadrudd.contactanalyser.utils.Constants;
 public class ContactAnalyserMainActivity extends AppCompatActivity implements View.OnClickListener,
         ContactAnalyserMainActivityFragment.OnMainFragmentLoadedListener,
         RemoveContactsFragment.OnRemoveContactsFragmentLoadedListener,
-        AddContactsFragment.OnAddContactsFragmentLoadedListener {
+        AddContactsFragment.OnAddContactsFragmentLoadedListener,
+        EnterContactNamesFragment.EnterContactNamesFragmentListener {
 
     private Button btnAnalyseCallLog;
     private Button btnRemoveContacts;
@@ -49,6 +51,7 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
     // Need to pass around these booleans by reference...
     private Boolean removeContactsFragmentCreated = false;
     private Boolean addContactsFragmentCreated = false;
+    private Boolean enterContactNamesFragmentCreated = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +103,9 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
             case R.id.btn_add_contacts:
                 addContactsButtonPressed();
                 break;
+            case R.id.btn_create_contacts:
+
+                break;
         }
     }
 
@@ -129,6 +135,13 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
     public void onAddContactsFragmentLoaded() {
         btnAddContacts = (Button) findViewById(R.id.btn_add_contacts);
         btnAddContacts.setOnClickListener(this);
+    }
+
+    @Override
+    public void onEnterContactNamesFragmentLoaded(String[] contactNames, String[] phoneNumbers) {
+        callLogDataAccessor.addContacts(this, contactNames, phoneNumbers);
+        viewPager.setCurrentItem(viewPager.getCurrentItem()-1);
+        Toast.makeText(this, "Added contacts!!", Toast.LENGTH_LONG).show();
     }
 
     public Button getBtnAnalyseCallLog(){
@@ -204,7 +217,7 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
                 new String[phoneNumbersWithSubstantialRegisteredCalls.size()]);
         createFragment(phoneNumbers, AddContactsFragment.ARGS_KEY, AddContactsFragment.class.getName(),
                addContactsFragmentCreated);
-        viewPager.setCurrentItem(viewPager.getCurrentItem()+1, true);
+        viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
     }
 
     private void createFragment(String[] initialArgs, String argumentKey, String nameOfFragment,
@@ -244,8 +257,12 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
     private void addContactsButtonPressed(){
         String[] phoneNumbersToRemove = getCheckBoxListAdapter(Constants.FRAGMENT_ADD_CONTACTS)
                 .getCheckBoxItemsChecked();
+        createFragment(phoneNumbersToRemove, EnterContactNamesFragment.ARGS_KEY,
+                EnterContactNamesFragment.class.getName(), enterContactNamesFragmentCreated);
         Log.d(Constants.TAG, Arrays.toString(phoneNumbersToRemove));
+        viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
     }
+
 
     public CheckBoxListAdapter getCheckBoxListAdapter(int fragmentID){
         return  (CheckBoxListAdapter) ((ListFragment)

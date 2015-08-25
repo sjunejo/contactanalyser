@@ -1,5 +1,6 @@
 package in.sadrudd.contactanalyser.data;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
@@ -128,6 +129,30 @@ public class CallLogDataAccessor {
                 sb.append(",?");
             }
             return sb.toString();
+        }
+    }
+
+    public void addContacts(Context context, String[] contactNames, String[] phoneNumbers){
+        // Getting raw contact ID TODO find more efficient means of doing this!
+        Cursor c = context.getContentResolver().query(ContactsContract.RawContacts.CONTENT_URI,
+                null, null ,null, null);
+        long rawContactId = 0;
+        if (c.moveToLast()) {
+            rawContactId=c.getLong(c.getColumnIndex(ContactsContract.RawContacts._ID));
+        }
+        c.close();
+
+        for (int i = 0; i < contactNames.length; i++){
+            ContentValues values = new ContentValues();
+            values.put(ContactsContract.CommonDataKinds.Phone.RAW_CONTACT_ID, ++rawContactId);
+            values.put(ContactsContract.CommonDataKinds.Phone.LABEL, contactNames[i]);
+            values.put(ContactsContract.CommonDataKinds.Phone.NUMBER, phoneNumbers[i]);
+            values.put(ContactsContract.CommonDataKinds.Phone.TYPE,
+                    ContactsContract.CommonDataKinds.Phone.TYPE_CUSTOM);
+            values.put(ContactsContract.Data.MIMETYPE,
+                    ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE);
+            Uri dataUri = context.getContentResolver().insert(android.provider.ContactsContract.Data.CONTENT_URI, values);
+
         }
     }
 }

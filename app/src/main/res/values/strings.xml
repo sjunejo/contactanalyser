@@ -5,6 +5,6 @@
     <string name="btn_analyse_call_log">Analyse Call Log</string>
     <string name="btn_remove_contacts">Remove Selected Contacts</string>
     <string name="btn_add_contacts">Add Selected Contacts</string>
-    <string name="btn_create_contacts">Create Selected Contacts</string>
+    <string name="btn_create_contacts">Create New Contacts</string>
     <string name="toast_contacts_removed">Contacts successfully removed</string>
 </resources>

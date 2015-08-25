@@ -40,7 +40,6 @@ public class RemoveContactsFragment extends ListFragment  {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_remove_contacts, container, false);
-
         setListAdapter(new CheckBoxListAdapter(getActivity(), contacts));
         return v;
     }
