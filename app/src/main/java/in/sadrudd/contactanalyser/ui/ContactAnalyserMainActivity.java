@@ -14,7 +14,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -103,9 +102,6 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
             case R.id.btn_add_contacts:
                 addContactsButtonPressed();
                 break;
-            case R.id.btn_create_contacts:
-
-                break;
         }
     }
 
@@ -137,15 +133,56 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
         btnAddContacts.setOnClickListener(this);
     }
 
-    @Override
-    public void onEnterContactNamesFragmentLoaded(String[] contactNames, String[] phoneNumbers) {
-        callLogDataAccessor.addContacts(this, contactNames, phoneNumbers);
-        viewPager.setCurrentItem(viewPager.getCurrentItem()-1);
-        Toast.makeText(this, "Added contacts!!", Toast.LENGTH_LONG).show();
+    private void removeContactsButtonPressed(){
+        String[] contactsToRemove = getCheckBoxListAdapter(Constants.FRAGMENT_REMOVE_CONTACTS)
+                .getCheckBoxItemsChecked();
+        createAreYouSureDialogue(contactsToRemove);
     }
 
-    public Button getBtnAnalyseCallLog(){
-        return btnAnalyseCallLog;
+    @Override
+    public void onContactNamesEntered(String[] contactNames, String[] phoneNumbers) {
+        callLogDataAccessor.addContacts(this, contactNames, phoneNumbers);
+        viewPager.setCurrentItem(viewPager.getCurrentItem()-2);
+    }
+
+    private void addContactsButtonPressed(){
+        String[] phoneNumbersToRemove = getCheckBoxListAdapter(Constants.FRAGMENT_ADD_CONTACTS)
+                .getCheckBoxItemsChecked();
+        createFragment(phoneNumbersToRemove, EnterContactNamesFragment.ARGS_KEY,
+                EnterContactNamesFragment.class.getName(), enterContactNamesFragmentCreated);
+        Log.d(Constants.TAG, Arrays.toString(phoneNumbersToRemove));
+        viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
+    }
+
+    private void prepareRemoveContactsFragment(List<PhoneNumberFrequencyObject> uniquePhoneNumbers){
+        Set<String> setOfContactsToConsiderRemoving = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+        setOfContactsToConsiderRemoving.addAll(contactsWithFewRegisteredCalls);
+        setOfContactsToConsiderRemoving.addAll(getContactsWithNoRegisteredCalls(uniquePhoneNumbers));
+        Log.d(Constants.TAG, setOfContactsToConsiderRemoving.toString());
+        String[] contacts = setOfContactsToConsiderRemoving.toArray(
+                new String[setOfContactsToConsiderRemoving.size()]);
+        createFragment(contacts, RemoveContactsFragment.ARGS_KEY,RemoveContactsFragment.class.getName(),
+                removeContactsFragmentCreated);
+        viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
+    }
+
+    private void prepareAddContactsFragment(){
+        String[] phoneNumbers = phoneNumbersWithSubstantialRegisteredCalls.toArray(
+                new String[phoneNumbersWithSubstantialRegisteredCalls.size()]);
+        createFragment(phoneNumbers, AddContactsFragment.ARGS_KEY, AddContactsFragment.class.getName(),
+                addContactsFragmentCreated);
+        viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
+    }
+
+    private void createFragment(String[] initialArgs, String argumentKey, String nameOfFragment,
+                                Boolean fragmentCreated){
+        Bundle args = new Bundle();
+        args.putStringArray(argumentKey, initialArgs);
+        if (!fragmentCreated){
+            fragments.add(Fragment.instantiate(this, nameOfFragment, args));
+            pagerAdapter.notifyDataSetChanged();
+            fragmentCreated = true;
+        }
     }
 
     private void analyseCallLogData(){
@@ -200,36 +237,6 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
         }
     }
 
-    private void prepareRemoveContactsFragment(List<PhoneNumberFrequencyObject> uniquePhoneNumbers){
-        Set<String> setOfContactsToConsiderRemoving = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
-        setOfContactsToConsiderRemoving.addAll(contactsWithFewRegisteredCalls);
-        setOfContactsToConsiderRemoving.addAll(getContactsWithNoRegisteredCalls(uniquePhoneNumbers));
-        Log.d(Constants.TAG, setOfContactsToConsiderRemoving.toString());
-        String[] contacts = setOfContactsToConsiderRemoving.toArray(
-                new String[setOfContactsToConsiderRemoving.size()]);
-        createFragment(contacts, RemoveContactsFragment.ARGS_KEY,RemoveContactsFragment.class.getName(),
-        removeContactsFragmentCreated);
-        viewPager.setCurrentItem(viewPager.getCurrentItem()+1, true);
-    }
-
-    private void prepareAddContactsFragment(){
-        String[] phoneNumbers = phoneNumbersWithSubstantialRegisteredCalls.toArray(
-                new String[phoneNumbersWithSubstantialRegisteredCalls.size()]);
-        createFragment(phoneNumbers, AddContactsFragment.ARGS_KEY, AddContactsFragment.class.getName(),
-               addContactsFragmentCreated);
-        viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
-    }
-
-    private void createFragment(String[] initialArgs, String argumentKey, String nameOfFragment,
-                                Boolean fragmentCreated){
-        Bundle args = new Bundle();
-        args.putStringArray(argumentKey, initialArgs);
-        if (!fragmentCreated){
-            fragments.add(Fragment.instantiate(this, nameOfFragment, args));
-            pagerAdapter.notifyDataSetChanged();
-            fragmentCreated = true;
-        }
-    }
 
     public Set<String> getContactsWithNoRegisteredCalls(List<PhoneNumberFrequencyObject> uniquePhoneNumbers){
         Set<String> contactsWithNoPhoneCalls = callLogDataAccessor.getContactNames(this);
@@ -248,20 +255,6 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
         return contactsWithNoPhoneCalls;
     }
 
-    private void removeContactsButtonPressed(){
-        String[] contactsToRemove = getCheckBoxListAdapter(Constants.FRAGMENT_REMOVE_CONTACTS)
-                .getCheckBoxItemsChecked();
-        createAreYouSureDialogue(contactsToRemove);
-    }
-
-    private void addContactsButtonPressed(){
-        String[] phoneNumbersToRemove = getCheckBoxListAdapter(Constants.FRAGMENT_ADD_CONTACTS)
-                .getCheckBoxItemsChecked();
-        createFragment(phoneNumbersToRemove, EnterContactNamesFragment.ARGS_KEY,
-                EnterContactNamesFragment.class.getName(), enterContactNamesFragmentCreated);
-        Log.d(Constants.TAG, Arrays.toString(phoneNumbersToRemove));
-        viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
-    }
 
 
     public CheckBoxListAdapter getCheckBoxListAdapter(int fragmentID){
@@ -300,6 +293,5 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
         builder.setMessage(stringBuilder.toString()).setPositiveButton("Yes", dialogClickListener)
                 .setNegativeButton("No", dialogClickListener).show();
     }
-
 
 }

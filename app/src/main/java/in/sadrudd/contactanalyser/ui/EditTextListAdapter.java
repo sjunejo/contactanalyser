@@ -49,7 +49,7 @@ public class EditTextListAdapter extends ArrayAdapter<String>  {
             // holder = new ViewHolder();
             LayoutInflater layoutInflater = LayoutInflater.from(getContext());
             v = layoutInflater.inflate(R.layout.listview_textview, null);
-            etContact = (EditText) v.findViewById(R.id.et_contact_name);
+            final EditText etContact = (EditText) v.findViewById(R.id.et_contact_name);
             etContact.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -62,7 +62,7 @@ public class EditTextListAdapter extends ArrayAdapter<String>  {
                 @Override
                 public void afterTextChanged(Editable s) {}
             });
-            tvPhoneNumber = (TextView) v.findViewById(R.id.tv_phone_number);
+            TextView tvPhoneNumber = (TextView) v.findViewById(R.id.tv_phone_number);
             tvPhoneNumber.setText(textViewItems[position]);
             // tv.setTag(holder);
         } else {

@@ -1,13 +1,17 @@
 package in.sadrudd.contactanalyser.data;
 
-import android.content.ContentValues;
+import android.content.ContentProviderOperation;
 import android.content.Context;
+import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.RemoteException;
 import android.provider.CallLog;
 import android.provider.ContactsContract;
 import android.util.Log;
+import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -133,26 +137,37 @@ public class CallLogDataAccessor {
     }
 
     public void addContacts(Context context, String[] contactNames, String[] phoneNumbers){
-        // Getting raw contact ID TODO find more efficient means of doing this!
-        Cursor c = context.getContentResolver().query(ContactsContract.RawContacts.CONTENT_URI,
-                null, null ,null, null);
-        long rawContactId = 0;
-        if (c.moveToLast()) {
-            rawContactId=c.getLong(c.getColumnIndex(ContactsContract.RawContacts._ID));
-        }
-        c.close();
-
+        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
         for (int i = 0; i < contactNames.length; i++){
-            ContentValues values = new ContentValues();
-            values.put(ContactsContract.CommonDataKinds.Phone.RAW_CONTACT_ID, ++rawContactId);
-            values.put(ContactsContract.CommonDataKinds.Phone.LABEL, contactNames[i]);
-            values.put(ContactsContract.CommonDataKinds.Phone.NUMBER, phoneNumbers[i]);
-            values.put(ContactsContract.CommonDataKinds.Phone.TYPE,
-                    ContactsContract.CommonDataKinds.Phone.TYPE_CUSTOM);
-            values.put(ContactsContract.Data.MIMETYPE,
-                    ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE);
-            Uri dataUri = context.getContentResolver().insert(android.provider.ContactsContract.Data.CONTENT_URI, values);
-
+            int rawContactID = ops.size();
+            ops.add(ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
+                    .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
+                    .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null)
+                    .build());
+            ops.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                    .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactID)
+                    .withValue(ContactsContract.Data.MIMETYPE,
+                            ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
+                    .withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME,
+                            contactNames[i])
+                    .build());
+            ops.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                    .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactID)
+                    .withValue(ContactsContract.Data.MIMETYPE,
+                            ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
+                    .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER,
+                            phoneNumbers[i])
+                    .withValue(ContactsContract.CommonDataKinds.Phone.TYPE,
+                            ContactsContract.CommonDataKinds.Phone.TYPE_CUSTOM)
+                    .build());
+        }
+        try {
+            context.getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
+            Toast.makeText(context, "Added contacts successfully!", Toast.LENGTH_LONG).show();
+        } catch (RemoteException e ){
+            e.printStackTrace();
+        } catch (OperationApplicationException e){
+            e.printStackTrace();
         }
     }
 }

@@ -25,7 +25,7 @@ public class EnterContactNamesFragment extends ListFragment implements View.OnCl
     private EnterContactNamesFragmentListener callback;
 
     public interface EnterContactNamesFragmentListener {
-        public void onEnterContactNamesFragmentLoaded(String[] contactNames, String[] phoneNumbers);
+        public void onContactNamesEntered(String[] contactNames, String[] phoneNumbers);
     }
 
     public static final String ARGS_KEY = "ADD_CONTACTS_TEXTVIEW";
@@ -71,7 +71,7 @@ public class EnterContactNamesFragment extends ListFragment implements View.OnCl
         // Lazy loading of callback?
         try {
             callback = (EnterContactNamesFragmentListener) getActivity();
-            callback.onEnterContactNamesFragmentLoaded(contactNames, phoneNumbers);
+            callback.onContactNamesEntered(contactNames, phoneNumbers);
         } catch (ClassCastException e){
             throw new ClassCastException(getActivity().toString() + "must implement OnMainFragmentLoadedListener");
         }
