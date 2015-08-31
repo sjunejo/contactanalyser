@@ -15,7 +15,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -35,10 +34,6 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
         AddContactsFragment.OnAddContactsFragmentLoadedListener,
         EnterContactNamesFragment.EnterContactNamesFragmentListener {
 
-    private Button btnAnalyseCallLog;
-    private Button btnRemoveContacts;
-    private Button btnAddContacts;
-
     private TextView tvCallLog;
 
     private CallLogDataAccessor callLogDataAccessor;
@@ -47,10 +42,6 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
     private ViewPager viewPager;
     private PagerAdapter pagerAdapter;
 
-    // Need to pass around these booleans by reference...
-    private Boolean removeContactsFragmentCreated = false;
-    private Boolean addContactsFragmentCreated = false;
-    private Boolean enterContactNamesFragmentCreated = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,8 +75,8 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
     private void initialiseFragments(){
         fragments = new Vector<Fragment>();
         fragments.add(Fragment.instantiate(this, ContactAnalyserMainActivityFragment.class.getName()));
-        viewPager = (ViewPager) findViewById(R.id.pager);
-        pagerAdapter = new FragmentAdapter(getSupportFragmentManager(), fragments);
+        viewPager = (NonSwipeableViewPager) findViewById(R.id.pager);
+        pagerAdapter = new FragmentPagerAdapter(getSupportFragmentManager(), fragments);
         viewPager.setAdapter(pagerAdapter);
     }
 
@@ -102,6 +93,12 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
             case R.id.btn_add_contacts:
                 addContactsButtonPressed();
                 break;
+            case R.id.btn_remove_contacts_skip:
+                prepareAddContactsFragment();
+                break;
+            case R.id.btn_add_contacts_skip:
+                resetToMainFragment();
+                break;
         }
     }
 
@@ -116,21 +113,26 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
 
     @Override
     public void onMainFragmentLoaded() {
-        btnAnalyseCallLog = (Button) findViewById(R.id.btn_analyse_call_log);
+        Button btnAnalyseCallLog = (Button) findViewById(R.id.btn_analyse_call_log);
         btnAnalyseCallLog.setOnClickListener(this);
         tvCallLog = (TextView) findViewById(R.id.tv_call_log);
     }
 
     @Override
     public void onRemoveContactsFragmentLoaded() {
-        btnRemoveContacts = (Button) findViewById(R.id.btn_remove_contacts);
+        Log.d(Constants.TAG, "Fragment  loaded " + fragments.get(1).getId());
+        Button btnRemoveContacts = (Button) findViewById(R.id.btn_remove_contacts);
         btnRemoveContacts.setOnClickListener(this);
+        Button btnRemoveContactsSkip = (Button) findViewById(R.id.btn_remove_contacts_skip);
+        btnRemoveContactsSkip.setOnClickListener(this);
     }
 
     @Override
     public void onAddContactsFragmentLoaded() {
-        btnAddContacts = (Button) findViewById(R.id.btn_add_contacts);
+        Button btnAddContacts = (Button) findViewById(R.id.btn_add_contacts);
         btnAddContacts.setOnClickListener(this);
+        Button btnAddContactsSkip = (Button) findViewById(R.id.btn_add_contacts_skip);
+        btnAddContactsSkip.setOnClickListener(this);
     }
 
     private void removeContactsButtonPressed(){
@@ -142,27 +144,47 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
     @Override
     public void onContactNamesEntered(String[] contactNames, String[] phoneNumbers) {
         callLogDataAccessor.addContacts(this, contactNames, phoneNumbers);
-        viewPager.setCurrentItem(viewPager.getCurrentItem()-2);
+        resetToMainFragment();
+    }
+
+    private void resetToMainFragment(){
+        Log.d(Constants.TAG, "Current child count: " + viewPager.getChildCount());
+        // Delete previous fragment TODO this will get its own method
+         viewPager.setCurrentItem(viewPager.getCurrentItem() - 2, true);
+
+        //deletePreviousFragment();
     }
 
     private void addContactsButtonPressed(){
-        String[] phoneNumbersToRemove = getCheckBoxListAdapter(Constants.FRAGMENT_ADD_CONTACTS)
+        String[] phoneNumbersToRemove = getCheckBoxListAdapter(Constants.FRAGMENT_REMOVE_CONTACTS)
                 .getCheckBoxItemsChecked();
         createFragment(phoneNumbersToRemove, EnterContactNamesFragment.ARGS_KEY,
-                EnterContactNamesFragment.class.getName(), enterContactNamesFragmentCreated);
+                EnterContactNamesFragment.class.getName(),
+                Constants.FRAGMENT_ENTER_CONTACTS);
         Log.d(Constants.TAG, Arrays.toString(phoneNumbersToRemove));
         viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
+        //deletePreviousFragment();
     }
 
-    private void prepareRemoveContactsFragment(List<PhoneNumberFrequencyObject> uniquePhoneNumbers){
+    private void deletePreviousFragment(){
+        // Delete previous fragment
+        getSupportFragmentManager().beginTransaction()
+                .remove(
+                        getSupportFragmentManager().getFragments().get(Constants.FRAGMENT_REMOVE_CONTACTS)).commit();
+        // fragments.remove(Constants.FRAGMENT_REMOVE_CONTACTS);
+        Log.d(Constants.TAG, "Current number of fragments:" + getSupportFragmentManager().getFragments().size());
+        pagerAdapter.notifyDataSetChanged();
+    }
+
+    private void prepareDataSetsAndRemoveContactsFragment(List<PhoneNumberFrequencyObject> uniquePhoneNumbers){
         Set<String> setOfContactsToConsiderRemoving = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
         setOfContactsToConsiderRemoving.addAll(contactsWithFewRegisteredCalls);
         setOfContactsToConsiderRemoving.addAll(getContactsWithNoRegisteredCalls(uniquePhoneNumbers));
         Log.d(Constants.TAG, setOfContactsToConsiderRemoving.toString());
         String[] contacts = setOfContactsToConsiderRemoving.toArray(
                 new String[setOfContactsToConsiderRemoving.size()]);
-        createFragment(contacts, RemoveContactsFragment.ARGS_KEY,RemoveContactsFragment.class.getName(),
-                removeContactsFragmentCreated);
+        createFragment(contacts, RemoveContactsFragment.ARGS_KEY, RemoveContactsFragment.class.getName(),
+                 Constants.FRAGMENT_REMOVE_CONTACTS);
         viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
     }
 
@@ -170,18 +192,23 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
         String[] phoneNumbers = phoneNumbersWithSubstantialRegisteredCalls.toArray(
                 new String[phoneNumbersWithSubstantialRegisteredCalls.size()]);
         createFragment(phoneNumbers, AddContactsFragment.ARGS_KEY, AddContactsFragment.class.getName(),
-                addContactsFragmentCreated);
+                Constants.FRAGMENT_ADD_CONTACTS);
         viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
+        // Delete previous fragment
+        //deletePreviousFragment();
     }
 
     private void createFragment(String[] initialArgs, String argumentKey, String nameOfFragment,
-                                Boolean fragmentCreated){
-        Bundle args = new Bundle();
-        args.putStringArray(argumentKey, initialArgs);
-        if (!fragmentCreated){
+                                int fragmentID){
+        if (fragments.size() != 3){
+            Bundle args = new Bundle();
+            args.putStringArray(argumentKey, initialArgs);
             fragments.add(Fragment.instantiate(this, nameOfFragment, args));
             pagerAdapter.notifyDataSetChanged();
-            fragmentCreated = true;
+            Log.d(Constants.TAG, "Fragment created");
+        } else {
+            Log.d(Constants.TAG, "Fragment re-used");
+            ((MutableData) fragments.get(fragmentID)).setData(initialArgs);
         }
     }
 
@@ -191,8 +218,7 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
                 .getAllUniquePhoneNumbersSortedByAscendingFrequency();
         Log.d(Constants.TAG, uniquePhoneNumbers.toString());
         partitionCallLogData(uniquePhoneNumbers);
-        prepareRemoveContactsFragment(uniquePhoneNumbers);
-        prepareAddContactsFragment();
+        prepareDataSetsAndRemoveContactsFragment(uniquePhoneNumbers);
     }
 
     // For now, we're just focusing on contacts with one or zero registered calls
@@ -237,7 +263,6 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
         }
     }
 
-
     public Set<String> getContactsWithNoRegisteredCalls(List<PhoneNumberFrequencyObject> uniquePhoneNumbers){
         Set<String> contactsWithNoPhoneCalls = callLogDataAccessor.getContactNames(this);
         //Log.d(Constants.TAG, "Contacts with no Calls: BEFORE");
@@ -254,8 +279,6 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
         //Log.d(Constants.TAG, contactsWithNoPhoneCalls.toString());
         return contactsWithNoPhoneCalls;
     }
-
-
 
     public CheckBoxListAdapter getCheckBoxListAdapter(int fragmentID){
         return  (CheckBoxListAdapter) ((ListFragment)
@@ -277,9 +300,9 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
                     case DialogInterface.BUTTON_POSITIVE:
                         callLogDataAccessor.deleteSelectedContacts(ContactAnalyserMainActivity.this,
                                 contactsToRemove);
-                        ArrayList<String> arrayListForRemovingContact = new ArrayList<String>();
-                        getCheckBoxListAdapter(Constants.FRAGMENT_REMOVE_CONTACTS)
-                                .removeFromListView(contactsToRemove);
+                        // Delete fragment and move on to next
+                        prepareAddContactsFragment();
+                        //getCheckBoxListAdapter(Constants.FRAGMENT_REMOVE_CONTACTS).removeFromListView(contactsToRemove);
                         //Yes button clicked
                         break;
 

@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 
 import java.util.Arrays;
@@ -16,7 +17,8 @@ import in.sadrudd.contactanalyser.utils.Constants;
 /**
  * Created by sjunjo on 25/08/15.
  */
-public class EnterContactNamesFragment extends ListFragment implements View.OnClickListener{
+public class EnterContactNamesFragment extends ListFragment implements View.OnClickListener,
+MutableData {
 
     private String[] phoneNumbers;
 
@@ -40,6 +42,8 @@ public class EnterContactNamesFragment extends ListFragment implements View.OnCl
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        Log.d(Constants.TAG, "OnCreateView() called");
         View v = inflater.inflate(R.layout.fragment_add_contact_textviews, container, false);
         setListAdapter(new EditTextListAdapter(getActivity(), phoneNumbers));
         return v;
@@ -77,6 +81,16 @@ public class EnterContactNamesFragment extends ListFragment implements View.OnCl
         }
     }
 
+    @Override
+    public void setData(String[] data) {
+        this.phoneNumbers = data;
+        ((ArrayAdapter<String>) getListAdapter()).notifyDataSetChanged();
+    }
 
-
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        callback = null;
+        setListAdapter(null);
+    }
 }

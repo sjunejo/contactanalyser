@@ -9,17 +9,18 @@ import java.util.List;
 /**
  * Created by sjunjo on 23/08/15.
  */
-public class FragmentAdapter extends FragmentStatePagerAdapter {
+public class FragmentPagerAdapter extends FragmentStatePagerAdapter {
 
     public static int pos = 0;
 
     private List<Fragment> fragments;
 
-    public FragmentAdapter(FragmentManager fm, List<Fragment> frags){
+    public FragmentPagerAdapter(FragmentManager fm, List<Fragment> frags){
         super(fm);
         this.fragments = frags;
 
     }
+
     @Override
     public Fragment getItem(int position) {
         return fragments.get(position);
@@ -35,7 +36,7 @@ public class FragmentAdapter extends FragmentStatePagerAdapter {
     }
 
     public static void setPos(int pos){
-        FragmentAdapter.pos = pos;
+        FragmentPagerAdapter.pos = pos;
     }
 
 }

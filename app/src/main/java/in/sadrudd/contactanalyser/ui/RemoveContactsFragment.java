@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 
 import in.sadrudd.contactanalyser.R;
 import in.sadrudd.contactanalyser.utils.Constants;
@@ -13,7 +14,7 @@ import in.sadrudd.contactanalyser.utils.Constants;
 /**
  * Created by sjunjo on 20/08/15.
  */
-public class RemoveContactsFragment extends ListFragment  {
+public class RemoveContactsFragment extends ListFragment implements MutableData {
 
     private OnRemoveContactsFragmentLoadedListener callback;
 
@@ -22,6 +23,8 @@ public class RemoveContactsFragment extends ListFragment  {
     }
 
     public static final String ARGS_KEY = "REMOVE_CONTACTS_FRAGMENT";
+
+    private View view;
 
     private String[] contacts;
 
@@ -33,15 +36,15 @@ public class RemoveContactsFragment extends ListFragment  {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         contacts = getArguments().getStringArray(ARGS_KEY);
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_remove_contacts, container, false);
+        Log.d(Constants.TAG, "OnCreateView() called");
+        view = inflater.inflate(R.layout.fragment_remove_contacts, container, false);
         setListAdapter(new CheckBoxListAdapter(getActivity(), contacts));
-        return v;
+        return view;
     }
 
     @Override
@@ -56,4 +59,17 @@ public class RemoveContactsFragment extends ListFragment  {
         }
     }
 
+    @Override
+    public void setData(String[] data) {
+        this.contacts = data;
+        ((ArrayAdapter<String>) getListAdapter()).notifyDataSetChanged();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        callback = null;
+        setListAdapter(null);
+        view = null;
+    }
 }

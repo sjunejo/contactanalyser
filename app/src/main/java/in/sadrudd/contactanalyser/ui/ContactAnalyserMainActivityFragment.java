@@ -29,6 +29,7 @@ public class ContactAnalyserMainActivityFragment extends Fragment  {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        Log.d(Constants.TAG, "OnCreateView() called");
         return inflater.inflate(R.layout.fragment_decluttr_main, container, false);
     }
 
