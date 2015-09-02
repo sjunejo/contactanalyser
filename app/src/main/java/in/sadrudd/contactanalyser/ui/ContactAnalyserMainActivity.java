@@ -3,7 +3,6 @@ package in.sadrudd.contactanalyser.ui;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.ListFragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
@@ -16,6 +15,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,7 +26,6 @@ import in.sadrudd.contactanalyser.R;
 import in.sadrudd.contactanalyser.data.CallLogDataAccessor;
 import in.sadrudd.contactanalyser.data.PhoneNumberFrequencyObject;
 import in.sadrudd.contactanalyser.utils.Constants;
-
 
 public class ContactAnalyserMainActivity extends AppCompatActivity implements View.OnClickListener,
         ContactAnalyserMainActivityFragment.OnMainFragmentLoadedListener,
@@ -42,6 +41,7 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
     private ViewPager viewPager;
     private PagerAdapter pagerAdapter;
 
+    private HashMap<String, Boolean> fragmentCreated;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +74,7 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
 
     private void initialiseFragments(){
         fragments = new Vector<Fragment>();
+        fragmentCreated = new HashMap<String, Boolean>();
         fragments.add(Fragment.instantiate(this, ContactAnalyserMainActivityFragment.class.getName()));
         viewPager = (NonSwipeableViewPager) findViewById(R.id.pager);
         pagerAdapter = new FragmentPagerAdapter(getSupportFragmentManager(), fragments);
@@ -150,13 +151,13 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
     private void resetToMainFragment(){
         Log.d(Constants.TAG, "Current child count: " + viewPager.getChildCount());
         // Delete previous fragment TODO this will get its own method
-         viewPager.setCurrentItem(viewPager.getCurrentItem() - 2, true);
+         viewPager.setCurrentItem(viewPager.getCurrentItem() - 3, true);
 
         //deletePreviousFragment();
     }
 
     private void addContactsButtonPressed(){
-        String[] phoneNumbersToRemove = getCheckBoxListAdapter(Constants.FRAGMENT_REMOVE_CONTACTS)
+        String[] phoneNumbersToRemove = getCheckBoxListAdapter(Constants.FRAGMENT_ADD_CONTACTS)
                 .getCheckBoxItemsChecked();
         createFragment(phoneNumbersToRemove, EnterContactNamesFragment.ARGS_KEY,
                 EnterContactNamesFragment.class.getName(),
@@ -184,7 +185,7 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
         String[] contacts = setOfContactsToConsiderRemoving.toArray(
                 new String[setOfContactsToConsiderRemoving.size()]);
         createFragment(contacts, RemoveContactsFragment.ARGS_KEY, RemoveContactsFragment.class.getName(),
-                 Constants.FRAGMENT_REMOVE_CONTACTS);
+                Constants.FRAGMENT_REMOVE_CONTACTS);
         viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
     }
 
@@ -200,16 +201,24 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
 
     private void createFragment(String[] initialArgs, String argumentKey, String nameOfFragment,
                                 int fragmentID){
-        if (fragments.size() != 3){
+        if (!fragmentExists(nameOfFragment)){
             Bundle args = new Bundle();
             args.putStringArray(argumentKey, initialArgs);
             fragments.add(Fragment.instantiate(this, nameOfFragment, args));
+            fragmentCreated.put(nameOfFragment, true);
+            Log.d(Constants.TAG, "FRAGMENT CREATED: SIZE = " + fragments.size());
             pagerAdapter.notifyDataSetChanged();
             Log.d(Constants.TAG, "Fragment created");
         } else {
             Log.d(Constants.TAG, "Fragment re-used");
-            ((MutableData) fragments.get(fragmentID)).setData(initialArgs);
+            ((IContactFragment) fragments.get(fragmentID)).setData(initialArgs);
         }
+    }
+
+    private boolean fragmentExists(String nameOfFragment){
+        if (!fragmentCreated.containsKey(nameOfFragment))
+            return false;
+        return fragmentCreated.get(nameOfFragment);
     }
 
     private void analyseCallLogData(){
@@ -281,9 +290,8 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
     }
 
     public CheckBoxListAdapter getCheckBoxListAdapter(int fragmentID){
-        return  (CheckBoxListAdapter) ((ListFragment)
-                fragments.get(fragmentID)).
-                getListAdapter();
+        return  (CheckBoxListAdapter) ((IContactFragment)
+                fragments.get(fragmentID)).getAdapter();
     }
 
     private void createAreYouSureDialogue(final String[] contactsToRemove){

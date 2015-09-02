@@ -1,12 +1,13 @@
 package in.sadrudd.contactanalyser.ui;
 
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
+import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 
 import in.sadrudd.contactanalyser.R;
 import in.sadrudd.contactanalyser.utils.Constants;
@@ -14,9 +15,11 @@ import in.sadrudd.contactanalyser.utils.Constants;
 /**
  * Created by sjunjo on 20/08/15.
  */
-public class RemoveContactsFragment extends ListFragment implements MutableData {
+public class RemoveContactsFragment extends Fragment implements IContactFragment {
 
     private OnRemoveContactsFragmentLoadedListener callback;
+
+    private RecyclerView recyclerView;
 
     public interface OnRemoveContactsFragmentLoadedListener {
         public void onRemoveContactsFragmentLoaded();
@@ -43,7 +46,9 @@ public class RemoveContactsFragment extends ListFragment implements MutableData 
                              Bundle savedInstanceState) {
         Log.d(Constants.TAG, "OnCreateView() called");
         view = inflater.inflate(R.layout.fragment_remove_contacts, container, false);
-        setListAdapter(new CheckBoxListAdapter(getActivity(), contacts));
+        recyclerView = (RecyclerView) view.findViewById(R.id.removecontacts_recycle_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setAdapter(new CheckBoxListAdapter(contacts));
         return view;
     }
 
@@ -62,14 +67,23 @@ public class RemoveContactsFragment extends ListFragment implements MutableData 
     @Override
     public void setData(String[] data) {
         this.contacts = data;
-        ((ArrayAdapter<String>) getListAdapter()).notifyDataSetChanged();
+        recyclerView.getAdapter().notifyDataSetChanged();
+    }
+
+    @Override
+    public String[] getData() {
+        return contacts;
+    }
+
+    @Override
+    public CheckBoxListAdapter getAdapter() {
+        return (CheckBoxListAdapter) recyclerView.getAdapter();
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         callback = null;
-        setListAdapter(null);
         view = null;
     }
 }

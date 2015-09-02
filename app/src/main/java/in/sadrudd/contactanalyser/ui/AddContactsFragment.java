@@ -1,12 +1,13 @@
 package in.sadrudd.contactanalyser.ui;
 
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
+import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 
 import in.sadrudd.contactanalyser.R;
 import in.sadrudd.contactanalyser.utils.Constants;
@@ -14,12 +15,13 @@ import in.sadrudd.contactanalyser.utils.Constants;
 /**
  * Created by sjunjo on 24/08/15.
  */
-public class AddContactsFragment extends ListFragment implements MutableData {
+public class AddContactsFragment extends Fragment implements IContactFragment {
 
     public static final String ARGS_KEY = "ADD_CONTACTS_FRAGMENT";
 
     private OnAddContactsFragmentLoadedListener callback;
     private View view;
+    private RecyclerView recyclerView;
 
     public interface OnAddContactsFragmentLoadedListener {
         public void onAddContactsFragmentLoaded();
@@ -42,7 +44,9 @@ public class AddContactsFragment extends ListFragment implements MutableData {
                              Bundle savedInstanceState) {
         Log.d(Constants.TAG, "OnCreateView() called");
         view = inflater.inflate(R.layout.fragment_add_contacts, container, false);
-        setListAdapter(new CheckBoxListAdapter(getActivity(), phoneNumbers));
+        recyclerView = (RecyclerView) view.findViewById(R.id.addcontacts_recycle_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setAdapter(new CheckBoxListAdapter(phoneNumbers));
         return view;
     }
 
@@ -63,15 +67,22 @@ public class AddContactsFragment extends ListFragment implements MutableData {
     public void onDestroyView() {
         super.onDestroyView();
         callback = null;
-        setListAdapter(null);
         view = null;
     }
 
     @Override
     public void setData(String[] data) {
         this.phoneNumbers = data;
-        ((ArrayAdapter<String>) getListAdapter()).notifyDataSetChanged();
+        recyclerView.getAdapter().notifyDataSetChanged();
     }
 
+    @Override
+    public String[] getData() {
+        return phoneNumbers;
+    }
 
+    @Override
+    public CheckBoxListAdapter getAdapter() {
+        return (CheckBoxListAdapter) recyclerView.getAdapter();
+    }
 }

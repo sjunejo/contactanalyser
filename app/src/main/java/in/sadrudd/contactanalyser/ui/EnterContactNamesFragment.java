@@ -18,7 +18,7 @@ import in.sadrudd.contactanalyser.utils.Constants;
  * Created by sjunjo on 25/08/15.
  */
 public class EnterContactNamesFragment extends ListFragment implements View.OnClickListener,
-MutableData {
+        IContactFragment {
 
     private String[] phoneNumbers;
 
@@ -85,6 +85,16 @@ MutableData {
     public void setData(String[] data) {
         this.phoneNumbers = data;
         ((ArrayAdapter<String>) getListAdapter()).notifyDataSetChanged();
+    }
+
+    @Override
+    public String[] getData() {
+        return phoneNumbers;
+    }
+
+    @Override
+    public CheckBoxListAdapter getAdapter() {
+        return (CheckBoxListAdapter) getListAdapter();
     }
 
     @Override
