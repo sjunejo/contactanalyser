@@ -49,11 +49,22 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
 
     private HashMap<String, Boolean> fragmentCreated;
 
+    private String[] currentFragmentData;
+    private int currentFragmentID;
+    private String currentArgsKey;
+    private String currentClassName;
+
+    // For re-creation of fragments after auto-rotation
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_screen_slide);
         initialiseFragments();
+        if (savedInstanceState != null) {
+
+        }
     }
 
     @Override
@@ -125,7 +136,6 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
 
     @Override
     public void onRemoveContactsFragmentLoaded() {
-        Log.d(Constants.TAG, "Fragment  loaded " + fragments.get(1).getId());
         Button btnRemoveContacts = (Button) findViewById(R.id.btn_remove_contacts);
         btnRemoveContacts.setOnClickListener(this);
         Button btnRemoveContactsSkip = (Button) findViewById(R.id.btn_remove_contacts_skip);
@@ -153,11 +163,8 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
     }
 
     private void resetToMainFragment(){
-        Log.d(Constants.TAG, "Current child count: " + viewPager.getChildCount());
-        // Delete previous fragment TODO this will get its own method
-         viewPager.setCurrentItem(viewPager.getCurrentItem() - 3, true);
-
-        //deletePreviousFragment();
+        // Log.d(Constants.TAG, "Current child count: " + viewPager.getChildCount());
+        viewPager.setCurrentItem(viewPager.getCurrentItem() - 3, true);
     }
 
     private void addContactsButtonPressed(){
@@ -168,17 +175,6 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
                 Constants.FRAGMENT_ENTER_CONTACTS);
         Log.d(Constants.TAG, Arrays.toString(phoneNumbersToRemove));
         viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
-        //deletePreviousFragment();
-    }
-
-    private void deletePreviousFragment(){
-        // Delete previous fragment
-        getSupportFragmentManager().beginTransaction()
-                .remove(
-                        getSupportFragmentManager().getFragments().get(Constants.FRAGMENT_REMOVE_CONTACTS)).commit();
-        // fragments.remove(Constants.FRAGMENT_REMOVE_CONTACTS);
-        Log.d(Constants.TAG, "Current number of fragments:" + getSupportFragmentManager().getFragments().size());
-        pagerAdapter.notifyDataSetChanged();
     }
 
     private void prepareDataSetsAndRemoveContactsFragment(List<PhoneNumberFrequencyObject> uniquePhoneNumbers){
@@ -199,8 +195,6 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
         createFragment(phoneNumbers, AddContactsFragment.ARGS_KEY, AddContactsFragment.class.getName(),
                 Constants.FRAGMENT_ADD_CONTACTS);
         viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
-        // Delete previous fragment
-        //deletePreviousFragment();
     }
 
     private void createFragment(String[] initialArgs, String argumentKey, String nameOfFragment,
@@ -217,6 +211,9 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
             Log.d(Constants.TAG, "Fragment re-used");
             ((IContactFragment) fragments.get(fragmentID)).setData(initialArgs);
         }
+        currentFragmentData = initialArgs;
+
+        currentFragmentID = fragmentID;
     }
 
     private boolean fragmentExists(String nameOfFragment){
@@ -329,4 +326,9 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
                 .setNegativeButton("No", dialogClickListener).show();
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(Constants.CURRENT_FRAGMENT, 2);
+    }
 }

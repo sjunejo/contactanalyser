@@ -5,7 +5,7 @@ package in.sadrudd.contactanalyser.utils;
  */
 public class Constants {
 
-    public static final String CALL_FREQUENCY_DELIMITER = "XXXXXX";
+    public static final String CURRENT_FRAGMENT = "FRAGMENT_OPEN";
 
     public  static final String TAG = "ContactAnalyser";
 
