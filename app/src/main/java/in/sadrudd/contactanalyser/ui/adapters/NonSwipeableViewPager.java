@@ -1,4 +1,4 @@
-package in.sadrudd.contactanalyser.ui;
+package in.sadrudd.contactanalyser.ui.adapters;
 
 import android.content.Context;
 import android.support.v4.view.ViewPager;

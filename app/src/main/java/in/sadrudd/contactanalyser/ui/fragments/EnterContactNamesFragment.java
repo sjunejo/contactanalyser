@@ -1,4 +1,4 @@
-package in.sadrudd.contactanalyser.ui;
+package in.sadrudd.contactanalyser.ui.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -12,6 +12,8 @@ import android.widget.Button;
 import java.util.Arrays;
 
 import in.sadrudd.contactanalyser.R;
+import in.sadrudd.contactanalyser.ui.adapters.CheckBoxListAdapter;
+import in.sadrudd.contactanalyser.ui.adapters.EditTextListAdapter;
 import in.sadrudd.contactanalyser.utils.Constants;
 
 /**

@@ -1,6 +1,8 @@
 package in.sadrudd.contactanalyser;
 
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.ViewInteraction;
+import android.support.test.espresso.assertion.ViewAssertions;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.ActivityInstrumentationTestCase2;
 
@@ -12,9 +14,8 @@ import in.sadrudd.contactanalyser.ui.ContactAnalyserMainActivity;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
 /**
  * Created by sjunjo on 28/07/15.
@@ -36,9 +37,12 @@ public class TestContactAnalyserMainActivity extends ActivityInstrumentationTest
     }
 
     @Test
-    public void testBtnAnalyseCallLogChangesText(){
+    public void testBtnAnalyseCallLogAddsRemoveContactsFragment(){
+        ViewInteraction removeContactsFragmentListView = onView(withId(R.id.removecontacts_recycle_view));
+        removeContactsFragmentListView.check(ViewAssertions.doesNotExist());
         onView(withId(R.id.btn_analyse_call_log)).perform(click());
-        onView(withId(R.id.tv_call_log)).check(matches(withText("")));
+        removeContactsFragmentListView.check(ViewAssertions.matches(isDisplayed()));
+
     }
 
     @Override

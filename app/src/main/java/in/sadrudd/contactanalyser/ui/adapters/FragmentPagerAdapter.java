@@ -1,4 +1,4 @@
-package in.sadrudd.contactanalyser.ui;
+package in.sadrudd.contactanalyser.ui.adapters;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;

@@ -12,7 +12,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -25,6 +24,14 @@ import java.util.Vector;
 import in.sadrudd.contactanalyser.R;
 import in.sadrudd.contactanalyser.data.CallLogDataAccessor;
 import in.sadrudd.contactanalyser.data.PhoneNumberFrequencyObject;
+import in.sadrudd.contactanalyser.ui.adapters.CheckBoxListAdapter;
+import in.sadrudd.contactanalyser.ui.adapters.FragmentPagerAdapter;
+import in.sadrudd.contactanalyser.ui.adapters.NonSwipeableViewPager;
+import in.sadrudd.contactanalyser.ui.fragments.AddContactsFragment;
+import in.sadrudd.contactanalyser.ui.fragments.ContactAnalyserMainActivityFragment;
+import in.sadrudd.contactanalyser.ui.fragments.EnterContactNamesFragment;
+import in.sadrudd.contactanalyser.ui.fragments.IContactFragment;
+import in.sadrudd.contactanalyser.ui.fragments.RemoveContactsFragment;
 import in.sadrudd.contactanalyser.utils.Constants;
 
 public class ContactAnalyserMainActivity extends AppCompatActivity implements View.OnClickListener,
@@ -33,7 +40,6 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
         AddContactsFragment.OnAddContactsFragmentLoadedListener,
         EnterContactNamesFragment.EnterContactNamesFragmentListener {
 
-    private TextView tvCallLog;
 
     private CallLogDataAccessor callLogDataAccessor;
 
@@ -86,7 +92,6 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
         switch (v.getId()){
             case R.id.btn_analyse_call_log:
                 analyseCallLogData();
-                tvCallLog.setText("");
                 break;
             case R.id.btn_remove_contacts:
                 removeContactsButtonPressed();
@@ -116,7 +121,6 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
     public void onMainFragmentLoaded() {
         Button btnAnalyseCallLog = (Button) findViewById(R.id.btn_analyse_call_log);
         btnAnalyseCallLog.setOnClickListener(this);
-        tvCallLog = (TextView) findViewById(R.id.tv_call_log);
     }
 
     @Override

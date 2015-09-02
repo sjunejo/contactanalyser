@@ -1,4 +1,4 @@
-package in.sadrudd.contactanalyser.ui;
+package in.sadrudd.contactanalyser.ui.adapters;
 
 import android.content.Context;
 import android.text.Editable;
@@ -15,7 +15,7 @@ import in.sadrudd.contactanalyser.R;
 /**
  * Created by sjunjo on 25/08/15.
  */
-public class EditTextListAdapter extends ArrayAdapter<String>  {
+public class EditTextListAdapter extends ArrayAdapter<String> {
 
     private String[] textViewItems;
     private String[] contactNames;
