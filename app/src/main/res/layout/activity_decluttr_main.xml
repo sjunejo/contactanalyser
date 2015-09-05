@@ -1,4 +1,14 @@
 
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:id="@+id/fragment_container"
+              android:orientation="horizontal">
+
+
+</LinearLayout>
+
+<!--
 
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools"
@@ -7,3 +17,5 @@
           tools:layout="@layout/fragment_decluttr_main"
           android:layout_width="match_parent"
           android:layout_height="match_parent"/>
+
+    -->

@@ -37,7 +37,9 @@ public class EnterContactNamesFragment extends ListFragment implements View.OnCl
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        phoneNumbers = getArguments().getStringArray(ARGS_KEY);
+        Bundle args = getArguments();
+        if (args.containsKey(ARGS_KEY))
+         phoneNumbers = args.getStringArray(ARGS_KEY);
     }
 
 

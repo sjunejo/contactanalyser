@@ -39,7 +39,9 @@ public class RemoveContactsFragment extends Fragment implements IContactFragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        contacts = getArguments().getStringArray(ARGS_KEY);
+        Bundle args = getArguments();
+        if (args.containsKey(ARGS_KEY))
+            contacts = args.getStringArray(ARGS_KEY);
     }
 
     @Override
@@ -68,7 +70,8 @@ public class RemoveContactsFragment extends Fragment implements IContactFragment
     @Override
     public void setData(String[] data) {
         this.contacts = data;
-        recyclerView.getAdapter().notifyDataSetChanged();
+        if (recyclerView != null)
+            recyclerView.getAdapter().notifyDataSetChanged();
     }
 
     @Override

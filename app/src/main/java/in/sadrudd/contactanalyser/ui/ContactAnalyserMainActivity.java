@@ -3,6 +3,8 @@ package in.sadrudd.contactanalyser.ui;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
@@ -19,14 +21,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.Vector;
 
 import in.sadrudd.contactanalyser.R;
 import in.sadrudd.contactanalyser.data.CallLogDataAccessor;
 import in.sadrudd.contactanalyser.data.PhoneNumberFrequencyObject;
 import in.sadrudd.contactanalyser.ui.adapters.CheckBoxListAdapter;
-import in.sadrudd.contactanalyser.ui.adapters.FragmentPagerAdapter;
-import in.sadrudd.contactanalyser.ui.adapters.NonSwipeableViewPager;
 import in.sadrudd.contactanalyser.ui.fragments.AddContactsFragment;
 import in.sadrudd.contactanalyser.ui.fragments.ContactAnalyserMainActivityFragment;
 import in.sadrudd.contactanalyser.ui.fragments.EnterContactNamesFragment;
@@ -49,22 +48,24 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
 
     private HashMap<String, Boolean> fragmentCreated;
 
-    private String[] currentFragmentData;
-    private int currentFragmentID;
-    private String currentArgsKey;
-    private String currentClassName;
+    private Set<String> contactsWithFewRegisteredCalls;
+    private Set<String> phoneNumbersWithSubstantialRegisteredCalls;
 
+    private String[] arrayPhoneNumbersWithSubstantialRegisteredCalls;
+    private String[] arrayContactsWithFewOrNoRegisteredCalls;
+
+    private static final String KEY_DATA_PREFIX = "KEY_DATA_";
+    private static final String KEY_CLASS_PREFIX = "KEY_CLASS_";
+    private static final String KEY_SUBSTANTIAL_CALLS = "KEY_SUBSTANTIAL_CALLS";
+    private static final String KEY_CONTACTS_FEW_CALLS = "KEY_CONTACTS_FEW_CALLS";
     // For re-creation of fragments after auto-rotation
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_screen_slide);
-        initialiseFragments();
-        if (savedInstanceState != null) {
-
-        }
+        setContentView(R.layout.activity_decluttr_main);
+        initialiseMainFragment();
     }
 
     @Override
@@ -89,13 +90,12 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
         return super.onOptionsItemSelected(item);
     }
 
-    private void initialiseFragments(){
-        fragments = new Vector<Fragment>();
-        fragmentCreated = new HashMap<String, Boolean>();
-        fragments.add(Fragment.instantiate(this, ContactAnalyserMainActivityFragment.class.getName()));
-        viewPager = (NonSwipeableViewPager) findViewById(R.id.pager);
-        pagerAdapter = new FragmentPagerAdapter(getSupportFragmentManager(), fragments);
-        viewPager.setAdapter(pagerAdapter);
+    private void initialiseMainFragment(){
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        Fragment mainActivityFragment = new ContactAnalyserMainActivityFragment();
+        fragmentTransaction.add(R.id.fragment_container, mainActivityFragment, Constants.TAG);
+        fragmentTransaction.commit();
     }
 
     @Override
@@ -121,11 +121,8 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
 
     @Override
     public void onBackPressed() {
-        if (viewPager.getCurrentItem() == 0){
-            super.onBackPressed();
-        } else {
-            viewPager.setCurrentItem(viewPager.getCurrentItem() - 1);
-        }
+        super.onBackPressed();
+
     }
 
     @Override
@@ -151,7 +148,7 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
     }
 
     private void removeContactsButtonPressed(){
-        String[] contactsToRemove = getCheckBoxListAdapter(Constants.FRAGMENT_REMOVE_CONTACTS)
+        String[] contactsToRemove = getCheckBoxListAdapter()
                 .getCheckBoxItemsChecked();
         createAreYouSureDialogue(contactsToRemove);
     }
@@ -162,64 +159,68 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
         resetToMainFragment();
     }
 
+    private void restoreCallData(Bundle savedInstanceState){
+        if (savedInstanceState.containsKey(KEY_CONTACTS_FEW_CALLS))
+            arrayContactsWithFewOrNoRegisteredCalls = savedInstanceState
+                    .getStringArray(KEY_CONTACTS_FEW_CALLS);
+        if (savedInstanceState.containsKey(KEY_SUBSTANTIAL_CALLS))
+            arrayContactsWithFewOrNoRegisteredCalls = savedInstanceState
+                    .getStringArray(KEY_SUBSTANTIAL_CALLS);
+    }
+
     private void resetToMainFragment(){
         // Log.d(Constants.TAG, "Current child count: " + viewPager.getChildCount());
-        viewPager.setCurrentItem(viewPager.getCurrentItem() - 3, true);
+        // viewPager.setCurrentItem(viewPager.getCurrentItem() - 3, true);
+        prepareFragment(null, "", ContactAnalyserMainActivityFragment.class.getName(), 0);
     }
 
     private void addContactsButtonPressed(){
-        String[] phoneNumbersToRemove = getCheckBoxListAdapter(Constants.FRAGMENT_ADD_CONTACTS)
+        String[] phoneNumbersToRemove = getCheckBoxListAdapter()
                 .getCheckBoxItemsChecked();
-        createFragment(phoneNumbersToRemove, EnterContactNamesFragment.ARGS_KEY,
+        prepareFragment(phoneNumbersToRemove, EnterContactNamesFragment.ARGS_KEY,
                 EnterContactNamesFragment.class.getName(),
                 Constants.FRAGMENT_ENTER_CONTACTS);
         Log.d(Constants.TAG, Arrays.toString(phoneNumbersToRemove));
-        viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
     }
 
     private void prepareDataSetsAndRemoveContactsFragment(List<PhoneNumberFrequencyObject> uniquePhoneNumbers){
-        Set<String> setOfContactsToConsiderRemoving = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
-        setOfContactsToConsiderRemoving.addAll(contactsWithFewRegisteredCalls);
-        setOfContactsToConsiderRemoving.addAll(getContactsWithNoRegisteredCalls(uniquePhoneNumbers));
-        Log.d(Constants.TAG, setOfContactsToConsiderRemoving.toString());
-        String[] contacts = setOfContactsToConsiderRemoving.toArray(
-                new String[setOfContactsToConsiderRemoving.size()]);
-        createFragment(contacts, RemoveContactsFragment.ARGS_KEY, RemoveContactsFragment.class.getName(),
+        if (arrayPhoneNumbersWithSubstantialRegisteredCalls == null){
+            Set<String> setOfContactsToConsiderRemoving = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+            setOfContactsToConsiderRemoving.addAll(contactsWithFewRegisteredCalls);
+            setOfContactsToConsiderRemoving.addAll(getContactsWithNoRegisteredCalls(uniquePhoneNumbers));
+            Log.d(Constants.TAG, setOfContactsToConsiderRemoving.toString());
+            arrayPhoneNumbersWithSubstantialRegisteredCalls = setOfContactsToConsiderRemoving.toArray(
+                    new String[setOfContactsToConsiderRemoving.size()]);
+        }
+        prepareFragment(arrayPhoneNumbersWithSubstantialRegisteredCalls, RemoveContactsFragment.ARGS_KEY, RemoveContactsFragment.class.getName(),
                 Constants.FRAGMENT_REMOVE_CONTACTS);
-        viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
     }
 
     private void prepareAddContactsFragment(){
-        String[] phoneNumbers = phoneNumbersWithSubstantialRegisteredCalls.toArray(
-                new String[phoneNumbersWithSubstantialRegisteredCalls.size()]);
-        createFragment(phoneNumbers, AddContactsFragment.ARGS_KEY, AddContactsFragment.class.getName(),
-                Constants.FRAGMENT_ADD_CONTACTS);
-        viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
-    }
-
-    private void createFragment(String[] initialArgs, String argumentKey, String nameOfFragment,
-                                int fragmentID){
-        if (!fragmentExists(nameOfFragment)){
-            Bundle args = new Bundle();
-            args.putStringArray(argumentKey, initialArgs);
-            fragments.add(Fragment.instantiate(this, nameOfFragment, args));
-            fragmentCreated.put(nameOfFragment, true);
-            Log.d(Constants.TAG, "FRAGMENT CREATED: SIZE = " + fragments.size());
-            pagerAdapter.notifyDataSetChanged();
-            Log.d(Constants.TAG, "Fragment created");
-        } else {
-            Log.d(Constants.TAG, "Fragment re-used");
-            ((IContactFragment) fragments.get(fragmentID)).setData(initialArgs);
+        if (arrayContactsWithFewOrNoRegisteredCalls == null){
+            arrayContactsWithFewOrNoRegisteredCalls = phoneNumbersWithSubstantialRegisteredCalls.toArray(
+                    new String[phoneNumbersWithSubstantialRegisteredCalls.size()]);
         }
-        currentFragmentData = initialArgs;
-
-        currentFragmentID = fragmentID;
+        prepareFragment(arrayContactsWithFewOrNoRegisteredCalls, AddContactsFragment.ARGS_KEY, AddContactsFragment.class.getName(),
+                Constants.FRAGMENT_ADD_CONTACTS);
     }
 
-    private boolean fragmentExists(String nameOfFragment){
-        if (!fragmentCreated.containsKey(nameOfFragment))
-            return false;
-        return fragmentCreated.get(nameOfFragment);
+    private void prepareFragment(String[] initialArgs, String argumentKey, String nameOfFragment,
+                                 int fragmentID){
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
+        Fragment nextFragment;
+        if (initialArgs != null) {
+            Bundle bundle = new Bundle();
+            bundle.putStringArray(argumentKey, initialArgs);
+            nextFragment = Fragment.instantiate(this, nameOfFragment, bundle);
+        }
+        else {
+            nextFragment = Fragment.instantiate(this, nameOfFragment);
+        }
+        fragmentTransaction.replace(R.id.fragment_container, nextFragment, Constants.TAG);
+        // fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
     }
 
     private void analyseCallLogData(){
@@ -234,8 +235,9 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
     // For now, we're just focusing on contacts with one or zero registered calls
     private int removeContactsCallThreshold = 2;
 
-    private Set<String> contactsWithFewRegisteredCalls;
-    private Set<String> phoneNumbersWithSubstantialRegisteredCalls;
+    private Fragment getCurrentFragment(){
+        return getSupportFragmentManager().findFragmentByTag(Constants.TAG);
+    }
 
     /**
      * One loop through PhoneNumber/Frequency pairs should be enough to determine
@@ -290,9 +292,9 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
         return contactsWithNoPhoneCalls;
     }
 
-    public CheckBoxListAdapter getCheckBoxListAdapter(int fragmentID){
-        return  (CheckBoxListAdapter) ((IContactFragment)
-                fragments.get(fragmentID)).getAdapter();
+    public CheckBoxListAdapter getCheckBoxListAdapter(){
+        return  ((IContactFragment)
+                getCurrentFragment()).getAdapter();
     }
 
     private void createAreYouSureDialogue(final String[] contactsToRemove){
@@ -329,6 +331,14 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(Constants.CURRENT_FRAGMENT, 2);
+
+        /**
+        outState.putStringArray(KEY_DATA_PREFIX + i, ((IContactFragment) fragments.get(i)).getData());
+        outState.putString(KEY_CLASS_PREFIX + i, fragments.get(i).getClass().getName());
+        **/
+        outState.putStringArray(KEY_CONTACTS_FEW_CALLS, arrayContactsWithFewOrNoRegisteredCalls);
+        outState.putStringArray(KEY_SUBSTANTIAL_CALLS, arrayPhoneNumbersWithSubstantialRegisteredCalls);
+
     }
+
 }

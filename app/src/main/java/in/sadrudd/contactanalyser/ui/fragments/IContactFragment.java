@@ -7,6 +7,7 @@ import in.sadrudd.contactanalyser.ui.adapters.CheckBoxListAdapter;
  */
 public interface IContactFragment {
 
+
     public void setData(String[] data);
 
     public String[] getData();

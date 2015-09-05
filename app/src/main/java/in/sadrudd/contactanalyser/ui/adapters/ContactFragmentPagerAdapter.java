@@ -2,20 +2,20 @@ package in.sadrudd.contactanalyser.ui.adapters;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentPagerAdapter;
 
 import java.util.List;
 
 /**
  * Created by sjunjo on 23/08/15.
  */
-public class FragmentPagerAdapter extends FragmentStatePagerAdapter {
+public class ContactFragmentPagerAdapter extends FragmentPagerAdapter {
 
     public static int pos = 0;
 
     private List<Fragment> fragments;
 
-    public FragmentPagerAdapter(FragmentManager fm, List<Fragment> frags){
+    public ContactFragmentPagerAdapter(FragmentManager fm, List<Fragment> frags){
         super(fm);
         this.fragments = frags;
 
@@ -36,7 +36,7 @@ public class FragmentPagerAdapter extends FragmentStatePagerAdapter {
     }
 
     public static void setPos(int pos){
-        FragmentPagerAdapter.pos = pos;
+        ContactFragmentPagerAdapter.pos = pos;
     }
 
 }
