@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -106,7 +107,6 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-
     }
 
     @Override
@@ -134,7 +134,12 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
     private void removeContactsButtonPressed(){
         String[] contactsToRemove = getCheckBoxListAdapter()
                 .getCheckBoxItemsChecked();
-        createAreYouSureDialogue(contactsToRemove);
+        if (contactsToRemove.length > 0){
+            createAreYouSureDialogue(contactsToRemove);
+        } else {
+            Toast.makeText(this, "You must select at least one contact to remove.",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
@@ -148,12 +153,18 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
     }
 
     private void addContactsButtonPressed(){
-        String[] phoneNumbersToRemove = getCheckBoxListAdapter()
+        String[] phoneNumbersToAdd = getCheckBoxListAdapter()
                 .getCheckBoxItemsChecked();
-        prepareFragment(phoneNumbersToRemove, EnterContactNamesFragment.ARGS_KEY,
-                EnterContactNamesFragment.class.getName(),
-                Constants.FRAGMENT_ENTER_CONTACTS, true);
-        Log.d(Constants.TAG, Arrays.toString(phoneNumbersToRemove));
+        if (phoneNumbersToAdd.length > 0){
+            prepareFragment(phoneNumbersToAdd, EnterContactNamesFragment.ARGS_KEY,
+                    EnterContactNamesFragment.class.getName(),
+                    Constants.FRAGMENT_ENTER_CONTACTS, true);
+            Log.d(Constants.TAG, Arrays.toString(phoneNumbersToAdd));
+        } else {
+            Toast.makeText(this, "You must select at least one phone number to add as a contact.",
+                    Toast.LENGTH_LONG).show();
+        }
+
     }
 
     private void prepareDataSetsAndRemoveContactsFragment(List<PhoneNumberFrequencyObject> uniquePhoneNumbers){
@@ -190,7 +201,6 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
         }
         nextFragment.setRetainInstance(true);
         fragmentTransaction.replace(R.id.fragment_container, nextFragment, Constants.TAG);
-        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
 
@@ -298,6 +308,5 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
         builder.setMessage(stringBuilder.toString()).setPositiveButton("Yes", dialogClickListener)
                 .setNegativeButton("No", dialogClickListener).show();
     }
-
 
 }

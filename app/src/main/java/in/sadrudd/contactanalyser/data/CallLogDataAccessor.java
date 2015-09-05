@@ -137,37 +137,48 @@ public class CallLogDataAccessor {
     }
 
     public void addContacts(Context context, String[] contactNames, String[] phoneNumbers){
+        boolean allContactsAddedSuccessfully = true;
         ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
         for (int i = 0; i < contactNames.length; i++){
-            int rawContactID = ops.size();
-            ops.add(ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
-                    .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
-                    .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null)
-                    .build());
-            ops.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
-                    .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactID)
-                    .withValue(ContactsContract.Data.MIMETYPE,
-                            ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
-                    .withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME,
-                            contactNames[i])
-                    .build());
-            ops.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
-                    .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactID)
-                    .withValue(ContactsContract.Data.MIMETYPE,
-                            ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
-                    .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER,
-                            phoneNumbers[i])
-                    .withValue(ContactsContract.CommonDataKinds.Phone.TYPE,
-                            ContactsContract.CommonDataKinds.Phone.TYPE_CUSTOM)
-                    .build());
+            if (contactNames[i] != null && !contactNames[i].trim().isEmpty()){
+                int rawContactID = ops.size();
+                ops.add(ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
+                        .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
+                        .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null)
+                        .build());
+                ops.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                        .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactID)
+                        .withValue(ContactsContract.Data.MIMETYPE,
+                                ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
+                        .withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME,
+                                contactNames[i])
+                        .build());
+                ops.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                        .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactID)
+                        .withValue(ContactsContract.Data.MIMETYPE,
+                                ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
+                        .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER,
+                                phoneNumbers[i])
+                        .withValue(ContactsContract.CommonDataKinds.Phone.TYPE,
+                                ContactsContract.CommonDataKinds.Phone.TYPE_CUSTOM)
+                        .build());
+            } else {
+                allContactsAddedSuccessfully = false;
+            }
+            try {
+                context.getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
+            } catch (RemoteException e ){
+                allContactsAddedSuccessfully = false;
+                e.printStackTrace();
+            } catch (OperationApplicationException e){
+                allContactsAddedSuccessfully = false;
+                e.printStackTrace();
+            }
+            if (allContactsAddedSuccessfully)
+                Toast.makeText(context, "Added contacts successfully!", Toast.LENGTH_LONG).show();
+            else
+                Toast.makeText(context, "Not all contacts added...maybe you didn't add names?", Toast.LENGTH_LONG).show();
         }
-        try {
-            context.getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
-            Toast.makeText(context, "Added contacts successfully!", Toast.LENGTH_LONG).show();
-        } catch (RemoteException e ){
-            e.printStackTrace();
-        } catch (OperationApplicationException e){
-            e.printStackTrace();
-        }
+
     }
 }

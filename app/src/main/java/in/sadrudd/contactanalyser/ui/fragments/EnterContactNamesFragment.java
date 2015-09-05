@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Toast;
 
 import java.util.Arrays;
 
@@ -73,16 +74,29 @@ public class EnterContactNamesFragment extends ListFragment implements View.OnCl
 
     private void createContactsButtonPressed(){
         String[] contactNames = ((EditTextListAdapter) getListAdapter()).getContactNames();
-        Log.d(Constants.TAG, "CONTACT NAMES:");
-        Log.d(Constants.TAG, Arrays.toString(contactNames));
+        if (atLeastOneContactNameEntered(contactNames)){
+            Log.d(Constants.TAG, "CONTACT NAMES:");
+            Log.d(Constants.TAG, Arrays.toString(contactNames));
 
-        // Lazy loading of callback?
-        try {
-            callback = (EnterContactNamesFragmentListener) getActivity();
-            callback.onContactNamesEntered(contactNames, phoneNumbers);
-        } catch (ClassCastException e){
-            throw new ClassCastException(getActivity().toString() + "must implement OnMainFragmentLoadedListener");
+            // Lazy loading of callback?
+            try {
+                callback = (EnterContactNamesFragmentListener) getActivity();
+                callback.onContactNamesEntered(contactNames, phoneNumbers);
+            } catch (ClassCastException e){
+                throw new ClassCastException(getActivity().toString() + "must implement OnMainFragmentLoadedListener");
+            }
+        } else {
+            Toast.makeText(getActivity(), "At least one contact name must be entered",
+                    Toast.LENGTH_LONG).show();
         }
+    }
+
+    private boolean atLeastOneContactNameEntered(String[] contactNames){
+        for (String contactName: contactNames){
+            if (contactName != null && !contactName.trim().isEmpty())
+                return true;
+        }
+        return false;
     }
 
     @Override
