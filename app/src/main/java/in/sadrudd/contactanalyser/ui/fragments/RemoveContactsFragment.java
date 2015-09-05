@@ -70,8 +70,7 @@ public class RemoveContactsFragment extends Fragment implements IContactFragment
     @Override
     public void setData(String[] data) {
         this.contacts = data;
-        if (recyclerView != null)
-            recyclerView.getAdapter().notifyDataSetChanged();
+        recyclerView.getAdapter().notifyDataSetChanged();
     }
 
     @Override

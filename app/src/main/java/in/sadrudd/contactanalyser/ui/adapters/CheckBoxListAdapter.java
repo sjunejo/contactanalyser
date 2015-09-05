@@ -33,6 +33,15 @@ public class CheckBoxListAdapter extends RecyclerView.Adapter<CheckBoxListAdapte
                 new String[itemsChecked.size()]);
     }
 
+    public boolean[] getIsCheckedArray(){
+        return isCheckedArray;
+    }
+
+    public void setIsCheckedArray(boolean[] isCheckedArray){
+        this.isCheckedArray = isCheckedArray;
+        notifyDataSetChanged();
+    }
+
     @Override
     public StringHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
