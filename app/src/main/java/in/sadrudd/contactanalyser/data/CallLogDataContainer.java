@@ -36,7 +36,6 @@ public class CallLogDataContainer {
             frequencyOfNumbers.put(phoneNumber, frequencyOfNumbers.get(phoneNumber)+1);
     }
 
-
     /**
      * Iterate through HashMap 'frequency of numbers' to produce a list of phone numbers
      * sorted in ascending order, in terms of the sum of incoming/outgoing calls.
@@ -72,6 +71,5 @@ public class CallLogDataContainer {
 
     public String getContactForPhoneNumber(String phoneNumber){
         return contactsHashMap.get(phoneNumber);
-
     }
 }

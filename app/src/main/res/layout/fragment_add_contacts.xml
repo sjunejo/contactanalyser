@@ -4,9 +4,14 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.15"
+        android:text="@string/desc_add_contacts"/>
     <android.support.v7.widget.RecyclerView android:id="@+id/addcontacts_recycle_view"
               android:layout_width="match_parent"
-              android:layout_weight="0.80"
+              android:layout_weight="0.65"
               android:layout_height="0dp"
               android:drawSelectorOnTop="false"/>
     <GridLayout
@@ -20,10 +25,14 @@
     <Button android:id="@+id/btn_add_contacts"
             android:text="@string/btn_add_contacts"
             android:layout_row="0"
+            android:textSize="@dimen/text_size_button"
+            style="?android:attr/borderlessButtonStyle"
             android:layout_height="match_parent"
             android:layout_column="0"/>
     <Button android:id="@+id/btn_add_contacts_skip"
             android:text="@string/btn_add_contacts_skip"
+            android:textSize="@dimen/text_size_button"
+            style="?android:attr/borderlessButtonStyle"
             android:layout_row="0"
             android:layout_height="match_parent"
             android:layout_gravity="fill_horizontal"

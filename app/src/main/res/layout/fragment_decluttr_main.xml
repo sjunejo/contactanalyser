@@ -14,11 +14,18 @@
         android:layout_height="wrap_content"
         android:text="@string/btn_analyse_call_log"
         android:id="@+id/btn_analyse_call_log"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"/>
+        android:textSize="@dimen/text_size_button"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"/>
+    <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:text="@string/desc_analyse_call_log"
+        android:layout_above="@+id/btn_analyse_call_log"
+        android:gravity="center"
+        android:layout_centerHorizontal="true">
+    </TextView>
 
 
 </RelativeLayout>

@@ -8,8 +8,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -42,37 +40,11 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
     private Set<String> contactsWithFewRegisteredCalls;
     private Set<String> phoneNumbersWithSubstantialRegisteredCalls;
 
-    private String[] arrayPhoneNumbersWithSubstantialRegisteredCalls;
-    private String[] arrayContactsWithFewOrNoRegisteredCalls;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_decluttr_main);
         initialiseMainFragment();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_decluttr_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     private void initialiseMainFragment(){
@@ -132,7 +104,7 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
     }
 
     private void removeContactsButtonPressed(){
-        String[] contactsToRemove = getCheckBoxListAdapter()
+        String[] contactsToRemove = getCheckBoxListAdapterOfCurrentFragment()
                 .getCheckBoxItemsChecked();
         if (contactsToRemove.length > 0){
             createAreYouSureDialogue(contactsToRemove);
@@ -153,7 +125,7 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
     }
 
     private void addContactsButtonPressed(){
-        String[] phoneNumbersToAdd = getCheckBoxListAdapter()
+        String[] phoneNumbersToAdd = getCheckBoxListAdapterOfCurrentFragment()
                 .getCheckBoxItemsChecked();
         if (phoneNumbersToAdd.length > 0){
             prepareFragment(phoneNumbersToAdd, EnterContactNamesFragment.ARGS_KEY,
@@ -164,7 +136,6 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
             Toast.makeText(this, "You must select at least one phone number to add as a contact.",
                     Toast.LENGTH_LONG).show();
         }
-
     }
 
     private void prepareDataSetsAndRemoveContactsFragment(List<PhoneNumberFrequencyObject> uniquePhoneNumbers){
@@ -172,16 +143,15 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
             setOfContactsToConsiderRemoving.addAll(contactsWithFewRegisteredCalls);
             setOfContactsToConsiderRemoving.addAll(getContactsWithNoRegisteredCalls(uniquePhoneNumbers));
             Log.d(Constants.TAG, setOfContactsToConsiderRemoving.toString());
-            arrayPhoneNumbersWithSubstantialRegisteredCalls = setOfContactsToConsiderRemoving.toArray(
+            String[] arrayPhoneNumbersWithSubstantialRegisteredCalls = setOfContactsToConsiderRemoving.toArray(
                     new String[setOfContactsToConsiderRemoving.size()]);
-
         prepareFragment(arrayPhoneNumbersWithSubstantialRegisteredCalls, RemoveContactsFragment.ARGS_KEY, RemoveContactsFragment.class.getName(),
                 Constants.FRAGMENT_REMOVE_CONTACTS, true);
     }
 
     private void prepareAddContactsFragment(){
-        arrayContactsWithFewOrNoRegisteredCalls = phoneNumbersWithSubstantialRegisteredCalls.toArray(
-                    new String[phoneNumbersWithSubstantialRegisteredCalls.size()]);
+        String[] arrayContactsWithFewOrNoRegisteredCalls = phoneNumbersWithSubstantialRegisteredCalls.toArray(
+                new String[phoneNumbersWithSubstantialRegisteredCalls.size()]);
         prepareFragment(arrayContactsWithFewOrNoRegisteredCalls, AddContactsFragment.ARGS_KEY, AddContactsFragment.class.getName(),
                 Constants.FRAGMENT_ADD_CONTACTS, true);
     }
@@ -213,12 +183,17 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
         prepareDataSetsAndRemoveContactsFragment(uniquePhoneNumbers);
     }
 
-    // For now, we're just focusing on contacts with one or zero registered calls
-    private int removeContactsCallThreshold = 2;
-
     private Fragment getCurrentFragment(){
         return getSupportFragmentManager().findFragmentByTag(Constants.TAG);
     }
+
+    public CheckBoxListAdapter getCheckBoxListAdapterOfCurrentFragment(){
+        return  ((IContactFragment)
+                getCurrentFragment()).getAdapter();
+    }
+
+    // For now, we're just focusing on contacts with one or zero registered calls
+    private int removeContactsCallThreshold = 2;
 
     /**
      * One loop through PhoneNumber/Frequency pairs should be enough to determine
@@ -273,11 +248,6 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
         return contactsWithNoPhoneCalls;
     }
 
-    public CheckBoxListAdapter getCheckBoxListAdapter(){
-        return  ((IContactFragment)
-                getCurrentFragment()).getAdapter();
-    }
-
     private void createAreYouSureDialogue(final String[] contactsToRemove){
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Deleting:\n\n");
@@ -292,9 +262,11 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
                     case DialogInterface.BUTTON_POSITIVE:
                         callLogDataAccessor.deleteSelectedContacts(ContactAnalyserMainActivity.this,
                                 contactsToRemove);
+                        Toast.makeText(ContactAnalyserMainActivity.this,
+                                "Contacts deleted successfully.", Toast.LENGTH_LONG).show();
                         // Delete fragment and move on to next
                         prepareAddContactsFragment();
-                        //getCheckBoxListAdapter(Constants.FRAGMENT_REMOVE_CONTACTS).removeFromListView(contactsToRemove);
+                        //getCheckBoxListAdapterOfCurrentFragment(Constants.FRAGMENT_REMOVE_CONTACTS).removeFromListView(contactsToRemove);
                         //Yes button clicked
                         break;
 

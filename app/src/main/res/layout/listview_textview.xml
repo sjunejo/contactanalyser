@@ -4,14 +4,16 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text=""
+        android:textSize="@dimen/text_size_standard"
         android:id="@+id/tv_phone_number"/>
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/et_contact_name"
         android:maxLines="1"
+        android:textSize="@dimen/text_size_standard"
         android:inputType="text"/>
 </LinearLayout>

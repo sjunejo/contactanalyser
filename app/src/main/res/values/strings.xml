@@ -2,10 +2,14 @@
     <string name="app_name">Contact Analyser</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="desc_analyse_call_log">To begin, click the button below to analyse your call history.</string>
+    <string name="desc_remove_contacts">The following are contacts with which you have the least registered calls. Select any you want to remove, or press \'Skip\'.</string>
+    <string name="desc_add_contacts">The following are numbers of those who have called you/have been called by you frequently, but are not contacts. Select any you want to add, or press \'Skip\'.</string>
+    <string name="desc_add_contacts_edittext">Add names for at least one contact (any numbers for which names have not been entered will not have contacts created).</string>
     <string name="btn_analyse_call_log">Analyse Call Log</string>
     <string name="btn_remove_contacts">Remove Selected Contacts</string>
     <string name="btn_remove_contacts_skip">Skip</string>
-    <string name="btn_add_contacts">Add Selected Contacts</string>
+    <string name="btn_add_contacts">Add Checked Contacts</string>
     <string name="btn_add_contacts_skip">Skip</string>
     <string name="btn_create_contacts">Create New Contacts</string>
     <string name="toast_contacts_removed">Contacts successfully removed</string>

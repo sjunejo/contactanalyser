@@ -8,14 +8,11 @@ import android.net.Uri;
 import android.os.RemoteException;
 import android.provider.CallLog;
 import android.provider.ContactsContract;
-import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Set;
-
-import in.sadrudd.contactanalyser.utils.Constants;
 
 /**
  * Created by sjunjo on 30/07/15.
@@ -107,15 +104,15 @@ public class CallLogDataAccessor {
     public void deleteSelectedContacts(Context context, String[] contacts){
         String strQuery = ContactsContract.Contacts.DISPLAY_NAME + " IN ("
                 + makePlaceholders(contacts.length) + ")";
-        Log.d(Constants.TAG, "" + strQuery);
+        // Log.d(Constants.TAG, "" + strQuery);
         Cursor cursor = context.getContentResolver().query(ContactsContract.Contacts.CONTENT_URI,
                 new String[]{ContactsContract.Contacts.DISPLAY_NAME, ContactsContract.Contacts.LOOKUP_KEY},
                 strQuery, contacts, null);
         cursor.moveToFirst();
-        Log.d(Constants.TAG, "Query carried out: " + cursor.getCount());
+        // Log.d(Constants.TAG, "Query carried out: " + cursor.getCount());
         do { // TODO get rid of magic numbers here
             String contact = cursor.getString(0);
-            Log.d(Constants.TAG, "DP: " + contact);
+            // Log.d(Constants.TAG, "DP: " + contact);
             Uri uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_LOOKUP_URI, cursor.getString(1));
             context.getContentResolver().delete(uri, null, null);
         } while (cursor.moveToNext());

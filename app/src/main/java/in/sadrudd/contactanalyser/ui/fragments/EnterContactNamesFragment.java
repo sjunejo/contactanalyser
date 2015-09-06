@@ -1,12 +1,13 @@
 package in.sadrudd.contactanalyser.ui.fragments;
 
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
+import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -20,12 +21,14 @@ import in.sadrudd.contactanalyser.utils.Constants;
 /**
  * Created by sjunjo on 25/08/15.
  */
-public class EnterContactNamesFragment extends ListFragment implements View.OnClickListener,
+public class EnterContactNamesFragment extends Fragment implements View.OnClickListener,
         IContactFragment {
 
     private String[] phoneNumbers;
 
     private Button btnCreateContacts;
+
+    private View view;
 
     private EnterContactNamesFragmentListener callback;
 
@@ -34,6 +37,8 @@ public class EnterContactNamesFragment extends ListFragment implements View.OnCl
     }
 
     public static final String ARGS_KEY = "ADD_CONTACTS_TEXTVIEW";
+
+    private RecyclerView recyclerView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,11 +52,12 @@ public class EnterContactNamesFragment extends ListFragment implements View.OnCl
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         Log.d(Constants.TAG, "OnCreateView() called");
-        View v = inflater.inflate(R.layout.fragment_add_contact_textviews, container, false);
-        setListAdapter(new EditTextListAdapter(getActivity(), phoneNumbers));
-        return v;
+        view = inflater.inflate(R.layout.fragment_add_contact_textviews, container, false);
+        recyclerView = (RecyclerView) view.findViewById(R.id.addcontacts_textviews_recycle_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setAdapter(new EditTextListAdapter(phoneNumbers));
+        return view;
     }
 
     @Override
@@ -60,8 +66,8 @@ public class EnterContactNamesFragment extends ListFragment implements View.OnCl
         btnCreateContacts = (Button) view.findViewById(R.id.btn_create_contacts);
         btnCreateContacts.setOnClickListener(this);
         Log.d(Constants.TAG, "Create Contacts fragment loaded and attached");
-
     }
+
 
     @Override
     public void onClick(View v) {
@@ -73,7 +79,7 @@ public class EnterContactNamesFragment extends ListFragment implements View.OnCl
     }
 
     private void createContactsButtonPressed(){
-        String[] contactNames = ((EditTextListAdapter) getListAdapter()).getContactNames();
+        String[] contactNames = ((EditTextListAdapter) recyclerView.getAdapter()).getContactNames();
         if (atLeastOneContactNameEntered(contactNames)){
             Log.d(Constants.TAG, "CONTACT NAMES:");
             Log.d(Constants.TAG, Arrays.toString(contactNames));
@@ -102,7 +108,7 @@ public class EnterContactNamesFragment extends ListFragment implements View.OnCl
     @Override
     public void setData(String[] data) {
         this.phoneNumbers = data;
-        ((ArrayAdapter<String>) getListAdapter()).notifyDataSetChanged();
+        (recyclerView.getAdapter()).notifyDataSetChanged();
     }
 
     @Override
@@ -112,13 +118,15 @@ public class EnterContactNamesFragment extends ListFragment implements View.OnCl
 
     @Override
     public CheckBoxListAdapter getAdapter() {
-        return (CheckBoxListAdapter) getListAdapter();
+        return null;
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         callback = null;
-        setListAdapter(null);
+        recyclerView.setAdapter(null);
     }
+
+
 }

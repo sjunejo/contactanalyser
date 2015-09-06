@@ -5,20 +5,12 @@
 
     <CheckBox
         android:id="@+id/cb_contact"
+        android:textSize="@dimen/text_size_standard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:focusable="false"
         android:focusableInTouchMode="false" />
 
-    <!--
-    <TextView
-        android:id="@+id/tv_contact"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/cb_contact"
-        android:layout_alignBottom="@+id/cb_contact"
-        android:layout_toRightOf="@+id/cb_contact"
-        android:textSize="15sp" />
-     -->
+
 </RelativeLayout>

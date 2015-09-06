@@ -3,15 +3,22 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
-
-    <ListView android:id="@id/android:list"
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.15"
+        android:text="@string/desc_add_contacts_edittext"/>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/addcontacts_textviews_recycle_view"
               android:layout_width="match_parent"
-              android:layout_weight="0.80"
+              android:layout_weight="0.65"
               android:layout_height="0dp"
               android:drawSelectorOnTop="false"/>
     <Button android:id="@+id/btn_create_contacts"
             android:text="@string/btn_create_contacts"
             android:layout_width="match_parent"
+            android:textSize="@dimen/text_size_button"
+            style="?android:attr/borderlessButtonStyle"
             android:layout_height="0dp"
             android:layout_weight="0.20"
         >
