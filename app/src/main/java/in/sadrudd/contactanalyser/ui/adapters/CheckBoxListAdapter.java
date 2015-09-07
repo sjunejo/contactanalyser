@@ -70,15 +70,16 @@ public class CheckBoxListAdapter extends RecyclerView.Adapter<CheckBoxListAdapte
 
         public void bindStringAndIsChecked(int position){
             cbData.setText(currentListViewItems[position]);
-            cbData.setChecked(isCheckedArray[position]);
-            cbData.setTag(position);
+            // Bit of a hack. TODO solve using tags/positions
+            if (itemsChecked.contains(currentListViewItems[position]))
+                cbData.setChecked(true);
+            else
+                cbData.setChecked(false);
         }
 
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             String contactName = buttonView.getText().toString();
-            int position = (Integer) buttonView.getTag();
-            isCheckedArray[position] = buttonView.isChecked();
             if (isChecked)
                 itemsChecked.add(contactName);
             else

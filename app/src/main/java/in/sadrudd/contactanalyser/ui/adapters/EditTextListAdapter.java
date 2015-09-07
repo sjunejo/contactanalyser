@@ -3,6 +3,7 @@ package in.sadrudd.contactanalyser.ui.adapters;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import in.sadrudd.contactanalyser.R;
+import in.sadrudd.contactanalyser.utils.Constants;
 
 /**
  * Created by sjunjo on 25/08/15.
@@ -26,7 +28,6 @@ public class EditTextListAdapter extends RecyclerView.Adapter<EditTextListAdapte
     public EditTextListAdapter(String[] tvItems){
         this.textViewItems = tvItems;
         contactNames = new String[tvItems.length];
-        setHasStableIds(true);
     }
 
     @Override
@@ -58,6 +59,7 @@ public class EditTextListAdapter extends RecyclerView.Adapter<EditTextListAdapte
         public StringHolder(View itemView){
             super(itemView);
             etContactName = (EditText) itemView.findViewById(R.id.et_contact_name);
+            tvPhoneNumber = (TextView) itemView.findViewById(R.id.tv_phone_number);
             etContactName.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -75,12 +77,20 @@ public class EditTextListAdapter extends RecyclerView.Adapter<EditTextListAdapte
 
                 }
             });
-            tvPhoneNumber = (TextView) itemView.findViewById(R.id.tv_phone_number);
         }
 
         public void bindStringAndIsChecked(int position){
             tvPhoneNumber.setText(textViewItems[position]);
             etContactName.setTag(position);
+            if (contactNames[position] != null)
+                etContactName.setText(contactNames[position]);
+            else {
+                Log.d(Constants.TAG, "Position at " + position + " empty");
+                etContactName.setText("");
+            }
+
+
+
         }
 
     }

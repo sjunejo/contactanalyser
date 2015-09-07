@@ -1,6 +1,8 @@
 package in.sadrudd.contactanalyser.ui;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -116,11 +118,10 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
 
     @Override
     public void onContactNamesEntered(String[] contactNames, String[] phoneNumbers) {
-        callLogDataAccessor.addContacts(this, contactNames, phoneNumbers);
-        resetToMainFragment();
+        new CreateNewContactsTask().execute(contactNames, phoneNumbers);
     }
 
-    private void resetToMainFragment(){
+    public void resetToMainFragment(){
         prepareFragment(null, "", ContactAnalyserMainActivityFragment.class.getName(), 0, true);
     }
 
@@ -279,6 +280,39 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(stringBuilder.toString()).setPositiveButton("Yes", dialogClickListener)
                 .setNegativeButton("No", dialogClickListener).show();
+    }
+
+    private class CreateNewContactsTask extends AsyncTask<String[], Void, Boolean> {
+
+        private ProgressDialog progDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progDialog = new ProgressDialog(ContactAnalyserMainActivity.this);
+            progDialog.setMessage("Loading...");
+            progDialog.setIndeterminate(false);
+            progDialog.setProgress(ProgressDialog.STYLE_SPINNER);
+            progDialog.setCancelable(false);
+            progDialog.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(String[]... params) {
+            boolean allContactsAddedSuccessfully = callLogDataAccessor.addContacts(ContactAnalyserMainActivity.this, params[0], params[1]);
+            return allContactsAddedSuccessfully;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean allContactsAddedSuccessfully) {
+            super.onPostExecute(allContactsAddedSuccessfully);
+            progDialog.dismiss();
+            resetToMainFragment();
+            if (allContactsAddedSuccessfully)
+                Toast.makeText(ContactAnalyserMainActivity.this, "Added contacts successfully!", Toast.LENGTH_LONG).show();
+            else
+                Toast.makeText(ContactAnalyserMainActivity.this, "Not all contacts added...maybe you didn't add names?", Toast.LENGTH_LONG).show();
+        }
     }
 
 }

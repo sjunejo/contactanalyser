@@ -14,6 +14,7 @@ import android.widget.Toast;
 import java.util.Arrays;
 
 import in.sadrudd.contactanalyser.R;
+import in.sadrudd.contactanalyser.ui.ContactAnalyserMainActivity;
 import in.sadrudd.contactanalyser.ui.adapters.CheckBoxListAdapter;
 import in.sadrudd.contactanalyser.ui.adapters.EditTextListAdapter;
 import in.sadrudd.contactanalyser.utils.Constants;
@@ -26,7 +27,6 @@ public class EnterContactNamesFragment extends Fragment implements View.OnClickL
 
     private String[] phoneNumbers;
 
-    private Button btnCreateContacts;
 
     private View view;
 
@@ -63,8 +63,10 @@ public class EnterContactNamesFragment extends Fragment implements View.OnClickL
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        btnCreateContacts = (Button) view.findViewById(R.id.btn_create_contacts);
+        Button btnCreateContacts = (Button) view.findViewById(R.id.btn_create_contacts);
         btnCreateContacts.setOnClickListener(this);
+        Button btnCreateContactsSkip = (Button) view.findViewById(R.id.btn_create_contacts_skip);
+        btnCreateContactsSkip.setOnClickListener(this);
         Log.d(Constants.TAG, "Create Contacts fragment loaded and attached");
     }
 
@@ -74,6 +76,9 @@ public class EnterContactNamesFragment extends Fragment implements View.OnClickL
         switch (v.getId()){
             case R.id.btn_create_contacts:
                 createContactsButtonPressed();
+                break;
+            case R.id.btn_create_contacts_skip:
+                ((ContactAnalyserMainActivity) getActivity()).resetToMainFragment();
                 break;
         }
     }

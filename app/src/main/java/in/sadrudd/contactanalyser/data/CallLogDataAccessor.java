@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.os.RemoteException;
 import android.provider.CallLog;
 import android.provider.ContactsContract;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -133,7 +132,7 @@ public class CallLogDataAccessor {
         }
     }
 
-    public void addContacts(Context context, String[] contactNames, String[] phoneNumbers){
+    public boolean addContacts(Context context, String[] contactNames, String[] phoneNumbers){
         boolean allContactsAddedSuccessfully = true;
         ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
         for (int i = 0; i < contactNames.length; i++){
@@ -171,11 +170,8 @@ public class CallLogDataAccessor {
                 allContactsAddedSuccessfully = false;
                 e.printStackTrace();
             }
-            if (allContactsAddedSuccessfully)
-                Toast.makeText(context, "Added contacts successfully!", Toast.LENGTH_LONG).show();
-            else
-                Toast.makeText(context, "Not all contacts added...maybe you didn't add names?", Toast.LENGTH_LONG).show();
-        }
 
+        }
+        return allContactsAddedSuccessfully;
     }
 }
