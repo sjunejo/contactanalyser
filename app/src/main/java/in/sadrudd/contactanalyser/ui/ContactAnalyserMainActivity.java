@@ -14,7 +14,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -132,7 +131,7 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
             prepareFragment(phoneNumbersToAdd, EnterContactNamesFragment.ARGS_KEY,
                     EnterContactNamesFragment.class.getName(),
                     Constants.FRAGMENT_ENTER_CONTACTS, true);
-            Log.d(Constants.TAG, Arrays.toString(phoneNumbersToAdd));
+            // Log.d(Constants.TAG, Arrays.toString(phoneNumbersToAdd));
         } else {
             Toast.makeText(this, "You must select at least one phone number to add as a contact.",
                     Toast.LENGTH_LONG).show();
@@ -143,7 +142,7 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
             Set<String> setOfContactsToConsiderRemoving = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
             setOfContactsToConsiderRemoving.addAll(contactsWithFewRegisteredCalls);
             setOfContactsToConsiderRemoving.addAll(getContactsWithNoRegisteredCalls(uniquePhoneNumbers));
-            Log.d(Constants.TAG, setOfContactsToConsiderRemoving.toString());
+            // Log.d(Constants.TAG, setOfContactsToConsiderRemoving.toString());
             String[] arrayPhoneNumbersWithSubstantialRegisteredCalls = setOfContactsToConsiderRemoving.toArray(
                     new String[setOfContactsToConsiderRemoving.size()]);
         prepareFragment(arrayPhoneNumbersWithSubstantialRegisteredCalls, RemoveContactsFragment.ARGS_KEY, RemoveContactsFragment.class.getName(),
@@ -179,7 +178,7 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
         callLogDataAccessor = new CallLogDataAccessor();
         List<PhoneNumberFrequencyObject> uniquePhoneNumbers = callLogDataAccessor.getCallLogData(this)
                 .getAllUniquePhoneNumbersSortedByAscendingFrequency();
-        Log.d(Constants.TAG, uniquePhoneNumbers.toString());
+        // Log.d(Constants.TAG, uniquePhoneNumbers.toString());
         partitionCallLogData(uniquePhoneNumbers);
         prepareDataSetsAndRemoveContactsFragment(uniquePhoneNumbers);
     }

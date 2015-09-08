@@ -4,14 +4,12 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import in.sadrudd.contactanalyser.R;
 import in.sadrudd.contactanalyser.ui.adapters.CheckBoxListAdapter;
-import in.sadrudd.contactanalyser.utils.Constants;
 
 /**
  * Created by sjunjo on 24/08/15.
@@ -45,7 +43,7 @@ public class AddContactsFragment extends Fragment implements IContactFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.d(Constants.TAG, "OnCreateView() called");
+        // Log.d(Constants.TAG, "OnCreateView() called");
         view = inflater.inflate(R.layout.fragment_add_contacts, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.addcontacts_recycle_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -57,7 +55,7 @@ public class AddContactsFragment extends Fragment implements IContactFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.d(Constants.TAG, "AddContacts fragment loaded and attached");
+        // Log.d(Constants.TAG, "AddContacts fragment loaded and attached");
         try {
             callback = (OnAddContactsFragmentLoadedListener) getActivity();
             callback.onAddContactsFragmentLoaded();

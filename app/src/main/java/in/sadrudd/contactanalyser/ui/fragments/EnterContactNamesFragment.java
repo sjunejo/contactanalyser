@@ -4,20 +4,16 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import java.util.Arrays;
-
 import in.sadrudd.contactanalyser.R;
 import in.sadrudd.contactanalyser.ui.ContactAnalyserMainActivity;
 import in.sadrudd.contactanalyser.ui.adapters.CheckBoxListAdapter;
 import in.sadrudd.contactanalyser.ui.adapters.EditTextListAdapter;
-import in.sadrudd.contactanalyser.utils.Constants;
 
 /**
  * Created by sjunjo on 25/08/15.
@@ -52,7 +48,7 @@ public class EnterContactNamesFragment extends Fragment implements View.OnClickL
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.d(Constants.TAG, "OnCreateView() called");
+        // Log.d(Constants.TAG, "OnCreateView() called");
         view = inflater.inflate(R.layout.fragment_add_contact_textviews, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.addcontacts_textviews_recycle_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -67,7 +63,7 @@ public class EnterContactNamesFragment extends Fragment implements View.OnClickL
         btnCreateContacts.setOnClickListener(this);
         Button btnCreateContactsSkip = (Button) view.findViewById(R.id.btn_create_contacts_skip);
         btnCreateContactsSkip.setOnClickListener(this);
-        Log.d(Constants.TAG, "Create Contacts fragment loaded and attached");
+        // Log.d(Constants.TAG, "Create Contacts fragment loaded and attached");
     }
 
 
@@ -86,8 +82,8 @@ public class EnterContactNamesFragment extends Fragment implements View.OnClickL
     private void createContactsButtonPressed(){
         String[] contactNames = ((EditTextListAdapter) recyclerView.getAdapter()).getContactNames();
         if (atLeastOneContactNameEntered(contactNames)){
-            Log.d(Constants.TAG, "CONTACT NAMES:");
-            Log.d(Constants.TAG, Arrays.toString(contactNames));
+            // Log.d(Constants.TAG, "CONTACT NAMES:");
+            // Log.d(Constants.TAG, Arrays.toString(contactNames));
 
             // Lazy loading of callback?
             try {

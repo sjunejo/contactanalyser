@@ -3,7 +3,6 @@ package in.sadrudd.contactanalyser.ui.adapters;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +12,6 @@ import android.widget.TextView;
 import java.util.List;
 
 import in.sadrudd.contactanalyser.R;
-import in.sadrudd.contactanalyser.utils.Constants;
 
 /**
  * Created by sjunjo on 25/08/15.
@@ -85,7 +83,7 @@ public class EditTextListAdapter extends RecyclerView.Adapter<EditTextListAdapte
             if (contactNames[position] != null)
                 etContactName.setText(contactNames[position]);
             else {
-                Log.d(Constants.TAG, "Position at " + position + " empty");
+                // Log.d(Constants.TAG, "Position at " + position + " empty");
                 etContactName.setText("");
             }
 
