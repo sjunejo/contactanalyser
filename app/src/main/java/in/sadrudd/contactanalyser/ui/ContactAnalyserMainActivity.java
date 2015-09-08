@@ -290,7 +290,7 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
         protected void onPreExecute() {
             super.onPreExecute();
             progDialog = new ProgressDialog(ContactAnalyserMainActivity.this);
-            progDialog.setMessage("Loading...");
+            progDialog.setMessage("Creating new contacts...");
             progDialog.setIndeterminate(false);
             progDialog.setProgress(ProgressDialog.STYLE_SPINNER);
             progDialog.setCancelable(false);
