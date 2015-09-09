@@ -14,8 +14,6 @@ import in.sadrudd.contactanalyser.R;
  */
 public class ContactAnalyserMainActivityFragment extends Fragment  {
 
-    private OnMainFragmentLoadedListener callback;
-
     public interface OnMainFragmentLoadedListener {
         public void onMainFragmentLoaded();
     }
@@ -36,7 +34,7 @@ public class ContactAnalyserMainActivityFragment extends Fragment  {
         super.onViewCreated(view, savedInstanceState);
         // Log.d(Constants.TAG, "Main fragment loaded and attached");
         try {
-            callback = (OnMainFragmentLoadedListener) getActivity();
+            OnMainFragmentLoadedListener callback = (OnMainFragmentLoadedListener) getActivity();
             callback.onMainFragmentLoaded();
         } catch (ClassCastException e){
             throw new ClassCastException(getActivity().toString() + "must implement OnMainFragmentLoadedListener");

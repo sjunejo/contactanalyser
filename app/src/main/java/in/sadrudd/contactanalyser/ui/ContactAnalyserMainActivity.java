@@ -193,7 +193,7 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
     }
 
     // For now, we're just focusing on contacts with one or zero registered calls
-    private int removeContactsCallThreshold = 2;
+    private static final int REMOVE_CONTACTS_CALL_THRESHOLD = 2;
 
     /**
      * One loop through PhoneNumber/Frequency pairs should be enough to determine
@@ -208,7 +208,7 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
         for (count = 0; count < uniquePhoneNumbers.size(); count++){
             PhoneNumberFrequencyObject phoneNumberFrequencyObject = uniquePhoneNumbers.get(count);
             // Check contact
-            if (phoneNumberFrequencyObject.getFrequency() >= removeContactsCallThreshold){
+            if (phoneNumberFrequencyObject.getFrequency() >= REMOVE_CONTACTS_CALL_THRESHOLD){
                 break;
             } else {
                 String contactName = callLogDataAccessor.getContactName(phoneNumberFrequencyObject
@@ -252,7 +252,7 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Deleting:\n\n");
         for (String contact: contactsToRemove){
-            stringBuilder.append(contact + "\n");
+            stringBuilder.append(contact).append("\n");
         }
         stringBuilder.append("\n\nAre you sure?");
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -263,13 +263,13 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
                         callLogDataAccessor.deleteSelectedContacts(ContactAnalyserMainActivity.this,
                                 contactsToRemove);
                         Toast.makeText(ContactAnalyserMainActivity.this,
-                                "Contacts deleted successfully.", Toast.LENGTH_LONG).show();
+                                getResources().getString(R.string.toast_contacts_removed),
+                                Toast.LENGTH_LONG).show();
                         // Delete fragment and move on to next
                         prepareAddContactsFragment();
                         //getCheckBoxListAdapterOfCurrentFragment(Constants.FRAGMENT_REMOVE_CONTACTS).removeFromListView(contactsToRemove);
                         //Yes button clicked
                         break;
-
                     case DialogInterface.BUTTON_NEGATIVE:
                         //No button clicked
                         break;
@@ -298,7 +298,8 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
 
         @Override
         protected Boolean doInBackground(String[]... params) {
-            boolean allContactsAddedSuccessfully = callLogDataAccessor.addContacts(ContactAnalyserMainActivity.this, params[0], params[1]);
+            boolean allContactsAddedSuccessfully = callLogDataAccessor.addContacts(
+                    ContactAnalyserMainActivity.this, params[0], params[1]);
             return allContactsAddedSuccessfully;
         }
 
@@ -308,9 +309,12 @@ public class ContactAnalyserMainActivity extends AppCompatActivity implements Vi
             progDialog.dismiss();
             resetToMainFragment();
             if (allContactsAddedSuccessfully)
-                Toast.makeText(ContactAnalyserMainActivity.this, "Added contacts successfully!", Toast.LENGTH_LONG).show();
+                Toast.makeText(ContactAnalyserMainActivity.this,
+                        "Added contacts successfully!", Toast.LENGTH_LONG).show();
             else
-                Toast.makeText(ContactAnalyserMainActivity.this, "Not all contacts added...maybe you didn't add names?", Toast.LENGTH_LONG).show();
+                Toast.makeText(ContactAnalyserMainActivity.this,
+                        "Not all contacts added...maybe you didn't add names?",
+                        Toast.LENGTH_LONG).show();
         }
     }
 

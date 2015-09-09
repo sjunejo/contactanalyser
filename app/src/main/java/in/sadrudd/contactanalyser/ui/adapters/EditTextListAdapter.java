@@ -9,8 +9,6 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import java.util.List;
-
 import in.sadrudd.contactanalyser.R;
 
 /**
@@ -20,8 +18,6 @@ public class EditTextListAdapter extends RecyclerView.Adapter<EditTextListAdapte
 
     private String[] textViewItems;
     private String[] contactNames;
-
-    private List<Object> itemsAsStrings;
 
     public EditTextListAdapter(String[] tvItems){
         this.textViewItems = tvItems;

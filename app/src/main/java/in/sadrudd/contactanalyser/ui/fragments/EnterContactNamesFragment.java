@@ -23,9 +23,6 @@ public class EnterContactNamesFragment extends Fragment implements View.OnClickL
 
     private String[] phoneNumbers;
 
-
-    private View view;
-
     private EnterContactNamesFragmentListener callback;
 
     public interface EnterContactNamesFragmentListener {
@@ -49,7 +46,7 @@ public class EnterContactNamesFragment extends Fragment implements View.OnClickL
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Log.d(Constants.TAG, "OnCreateView() called");
-        view = inflater.inflate(R.layout.fragment_add_contact_textviews, container, false);
+        View view = inflater.inflate(R.layout.fragment_add_contact_textviews, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.addcontacts_textviews_recycle_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(new EditTextListAdapter(phoneNumbers));
