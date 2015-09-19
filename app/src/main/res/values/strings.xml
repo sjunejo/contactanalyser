@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Contact Analyser</string>
+    <string name="app_name">Contacts Cleaner</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="desc_analyse_call_log">To begin, click the button below to analyse your call history.</string>
@@ -12,5 +12,7 @@
     <string name="btn_add_contacts">Add Checked Contacts</string>
     <string name="btn_add_contacts_skip">Skip</string>
     <string name="btn_create_contacts">Create New Contacts</string>
-    <string name="toast_contacts_removed">Contacts successfully removed</string>
+    <string name="toast_contacts_removed">Contacts deleted successfully!</string>
+    <string name="toast_contacts_added">Contacts added successfully!</string>
+    <string name="error_at_least_one_contact_to_add"></string>
 </resources>

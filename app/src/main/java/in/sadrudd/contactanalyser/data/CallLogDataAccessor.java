@@ -51,10 +51,9 @@ public class CallLogDataAccessor {
      * @return
      */
     public CallLogDataContainer getCallLogData(Context context){
-        Cursor cursor = context.getContentResolver().query(CallLog.Calls.CONTENT_URI, null, null, null,
-                null);
+        Cursor cursor = context.getContentResolver().query(CallLog.Calls.CONTENT_URI, null, null,
+                null, null);
         cursor.moveToFirst();
-        int[] columnIndexes = new int[columnsFromCallLogToReturn.length];
 
         // Get indices
         indexPhoneNumber = cursor.getColumnIndex(HEADING_NUMBER);
